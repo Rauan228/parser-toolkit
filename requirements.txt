@@ -1,5 +1,6 @@
-# All parsers use only the Python standard library
+# Currently the toolkit runs on the Python standard library only
 # (urllib, json, csv, ssl, argparse, unittest, …).
-# Python 3.8+ is enough — no third-party packages required.
+# Python 3.8+ is enough — no third-party packages required yet.
 #
-# No Apify SDK. No Playwright/Selenium. No paid API clients.
+# Positioning: No Apify. No browser automation. Local direct HTTP.
+# (If a future parser needs a dependency, add it here without changing that.)

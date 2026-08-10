@@ -6,7 +6,9 @@
 
 Directory parsers (2GIS / Yandex) collect **public business phones**. Real-estate parsers collect listing metadata; phone rules depend on the site (CIAN phones are open in page state; Krisha full phones need a logged-in browser session — see below).
 
-**No Apify.** All parsers talk to the platforms over Direct HTTP (stdlib only).
+**No Apify. No browser automation. Parsers run locally over direct HTTP.**
+
+Currently implemented with Python stdlib only.
 
 ---
 
@@ -33,7 +35,7 @@ Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/J
 ```bash
 git clone https://github.com/Rauan228/parser-toolkit.git
 cd parser-toolkit
-pip install -r requirements.txt   # stdlib-only; file kept for completeness
+pip install -r requirements.txt   # optional for now (stdlib is enough)
 ```
 
 ### 2GIS — Direct HTTP / Internal Catalog Web API

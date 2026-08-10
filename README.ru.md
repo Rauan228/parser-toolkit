@@ -4,7 +4,9 @@
 
 [English version →](README.md)
 
-**Без Apify.** Справочники ходят на платформы напрямую по HTTP.
+**Без Apify. Без browser automation. Парсеры запускаются локально по прямому HTTP.**
+
+Сейчас реализация — только Python stdlib.
 
 ---
 

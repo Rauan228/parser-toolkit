@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Yandex Maps places parser — collects organizations (e.g. daily-rent apartments)
-with OPEN phone numbers from Yandex Maps via the Apify actor
+Yandex Maps places parser — collects organizations of ANY category from Yandex
+Maps with their OPEN public phone numbers, via the Apify actor
 `zen-studio/yandex-maps-scraper`.
 
-Like 2GIS, Yandex Maps is a directory: phones are public. This is a SEPARATE
-dataset from 2GIS/CIAN (different hosts/apart-operators are listed), so it's
-a good third source to widen coverage and de-duplicate against the others.
+Yandex Maps is a directory: business phones are public. Search by any free-text
+query ("рестораны", "барбершоп", "шиномонтаж", "квартиры посуточно", ...) across
+any set of cities. Returns a dataset that's independent from 2GIS — combine both
+and de-duplicate by phone for wider coverage.
 
 Requires an Apify API token (free tier available). Set it via APIFY_TOKEN.
 The actor uses Apify's own proxies — no personal proxy needed.
@@ -14,16 +15,18 @@ The actor uses Apify's own proxies — no personal proxy needed.
 Output: CSV + JSON with phone, name, city, address, rating, url, coordinates.
 
 Usage:
-    APIFY_TOKEN="apify_api_..." python yandex_maps_parser.py
-    APIFY_TOKEN="..." QUERIES="квартиры посуточно" CITIES="Москва,Сочи" MAX=200 python yandex_maps_parser.py
+    APIFY_TOKEN="apify_api_..." QUERY="кофейни" CITIES="Москва,Сочи" python yandex_maps_parser.py
 """
 import re, json, time, os, csv, urllib.request, urllib.error
 
 APIFY_TOKEN = os.environ.get("APIFY_TOKEN", "")
 ACTOR = "zen-studio~yandex-maps-scraper"
-OUT = os.environ.get("OUT", "yandex_maps_daily_rent")
+OUT = os.environ.get("OUT", "yandex_maps_places")
 MAX = int(os.environ.get("MAX", "200"))
-QUERY = os.environ.get("QUERIES", "квартиры посуточно")
+
+# What to search for. Any category works: "рестораны", "автосервис", "аптеки",
+# "фитнес", "квартиры посуточно", etc. (QUERIES kept as an alias for convenience)
+QUERY = os.environ.get("QUERY", os.environ.get("QUERIES", "рестораны"))
 
 DEFAULT_CITIES = ["Москва", "Санкт-Петербург", "Сочи", "Казань", "Краснодар",
                   "Екатеринбург", "Новосибирск", "Нижний Новгород", "Ростов-на-Дону",
@@ -75,7 +78,7 @@ def _norm(p):
     d = re.sub(r"\D", "", str(p or ""))
     if len(d) == 11 and d[0] in "78": return "+7" + d[1:]
     if len(d) == 10: return "+7" + d
-    return None
+    return d and ("+" + d) or None
 
 FIELDS = ["phone", "phone2", "name", "city", "address", "rating", "latitude",
           "longitude", "url"]

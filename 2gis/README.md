@@ -1,11 +1,11 @@
 # 2GIS places parser
 
-Collects daily-rent apartment organizations **with open phones** from 2GIS via
-the Apify actor [`zen-studio/2gis-places-scraper-api`](https://apify.com/zen-studio/2gis-places-scraper-api).
+Collects organizations of **any category** from 2GIS with their **open public
+phones**, via the Apify actor [`zen-studio/2gis-places-scraper-api`](https://apify.com/zen-studio/2gis-places-scraper-api).
 
-2GIS is a business directory — phones are public by design. Daily-rent hosts sit
-under a fixed rubric **`rubricId/19487` ("Квартиры посуточно")**, identical in
-every Russian city, which targets private hosts/apart-operators (not hotels).
+2GIS is a business directory — phones are public by design, no "reveal" step.
+Search any free-text query across any set of cities, or point at exact 2GIS
+rubric/category URLs.
 
 ## Requirements
 - Python 3.8+ (stdlib only)
@@ -15,18 +15,25 @@ every Russian city, which targets private hosts/apart-operators (not hotels).
 
 ## Run
 ```bash
-APIFY_TOKEN="apify_api_..." python twogis_parser.py
+APIFY_TOKEN="apify_api_..." QUERY="кофейни" CITIES="moscow,spb" python twogis_parser.py
 ```
+
+`QUERY` can be anything: `рестораны`, `автосервис`, `стоматология`, `фитнес`,
+`квартиры посуточно`, …
 
 | Env | Default | Meaning |
 |---|---|---|
 | `APIFY_TOKEN` | — | Apify API token (**required**) |
+| `QUERY` | `рестораны` | search text (any category) |
 | `CITIES` | 17 major cities | comma-separated 2GIS slugs (`moscow`, `spb`, …) |
+| `START_URLS` | — | exact 2GIS URLs; overrides QUERY+CITIES |
 | `MAX` | `500` | max results per city |
-| `OUT` | `twogis_daily_rent` | output filename |
+| `OUT` | `twogis_places` | output filename |
 
 ## Output
 `phone, name, city, address, category, url`
 
-> Apify's free tier caps results per run; a small balance top-up lifts it for
-> full-scale collection across all cities.
+> Tip: for a precise category, grab a 2GIS rubric URL from the site and pass it
+> via `START_URLS` — e.g. daily-rent apartments live under `rubricId/19487`.
+
+> Apify's free tier caps results per run; a small balance top-up lifts it.

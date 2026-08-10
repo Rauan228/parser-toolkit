@@ -1,11 +1,11 @@
 # Yandex Maps places parser
 
-Collects daily-rent apartment organizations **with open phones** from Yandex Maps
-via the Apify actor [`zen-studio/yandex-maps-scraper`](https://apify.com/zen-studio/yandex-maps-scraper).
+Collects organizations of **any category** from Yandex Maps with their **open
+public phones**, via the Apify actor [`zen-studio/yandex-maps-scraper`](https://apify.com/zen-studio/yandex-maps-scraper).
 
-Yandex Maps is a directory, so phones are public. This is a **separate dataset**
-from 2GIS and CIAN (different hosts/apart-operators are listed) — a good third
-source to widen coverage. De-duplicate by phone against the others.
+Yandex Maps is a directory, so business phones are public. Returns a dataset
+**independent from 2GIS** — combine both and de-duplicate by phone for wider
+coverage.
 
 ## Requirements
 - Python 3.8+ (stdlib only)
@@ -15,16 +15,19 @@ source to widen coverage. De-duplicate by phone against the others.
 
 ## Run
 ```bash
-APIFY_TOKEN="apify_api_..." python yandex_maps_parser.py
+APIFY_TOKEN="apify_api_..." QUERY="барбершоп" CITIES="Москва,Сочи" python yandex_maps_parser.py
 ```
+
+`QUERY` can be anything: `рестораны`, `автосервис`, `аптеки`, `фитнес`,
+`квартиры посуточно`, …
 
 | Env | Default | Meaning |
 |---|---|---|
 | `APIFY_TOKEN` | — | Apify API token (**required**) |
-| `QUERIES` | `квартиры посуточно` | search query |
+| `QUERY` | `рестораны` | search text (any category) |
 | `CITIES` | 14 major cities | comma-separated city names (Cyrillic ok) |
 | `MAX` | `200` | max results per city |
-| `OUT` | `yandex_maps_daily_rent` | output filename |
+| `OUT` | `yandex_maps_places` | output filename |
 
 ## Output
 `phone, phone2, name, city, address, rating, latitude, longitude, url`

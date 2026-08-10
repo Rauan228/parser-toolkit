@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-CIAN daily-rent parser — extracts apartment listings with OPEN owner phone numbers
+CIAN listings parser — extracts real-estate listings with OPEN owner phone numbers
 straight from CIAN's embedded JSON state. No API key, no CAPTCHA, no "reveal phone"
 click: the phones are already in the page's server-rendered state.
+
+Works on ANY CIAN section — set CIAN_PATH to the search path you want:
+    snyat-kvartiru-posutochno   daily rent (default)
+    snyat-kvartiru              long-term rent
+    kupit-kvartiru              buy apartment
+    kupit-dom                   buy house
+    snyat-pomeshchenie          commercial rent
+(the phones live in the same JSON state regardless of section).
 
 Requires a Russian residential/mobile proxy (CIAN geo-blocks non-RU IPs and
 throws automation to a decoy "/museum" page without a real browser fingerprint).
 Set it via the PROXY env var.
 
-Output: CSV + JSON with phone, address, price/day, rooms, area, floor, metro,
+Output: CSV + JSON with phone, address, price, rooms, area, floor, metro,
         furniture, posted date, description and the listing URL.
 
 Usage:
     PROXY="http://user:pass@host:port" python cian_parser.py
-    PROXY="..." CITIES="www,spb,sochi" PAGES=5 python cian_parser.py
+    PROXY="..." CIAN_PATH="snyat-kvartiru" CITIES="www,spb" PAGES=5 python cian_parser.py
 """
 import re, json, time, os, csv, urllib.request, ssl, gzip, io
 
@@ -21,8 +29,10 @@ import re, json, time, os, csv, urllib.request, ssl, gzip, io
 PROXY = os.environ.get("PROXY", "")  # http://user:pass@host:port  (RU proxy required)
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
-OUT = os.environ.get("OUT", "cian_daily_rent")
+OUT = os.environ.get("OUT", "cian_listings")
 PAGES = int(os.environ.get("PAGES", "5"))
+# CIAN search section (any listing type works). Default: daily rent.
+CIAN_PATH = os.environ.get("CIAN_PATH", "snyat-kvartiru-posutochno").strip("/")
 SORTS = ["", "?sort=creation_date_desc", "?sort=price_object_order",
          "?sort=price_square_order_desc"]
 
@@ -45,7 +55,7 @@ def _cities():
     by_slug = {s: n for s, n in DEFAULT_CITIES}
     return [(s.strip(), by_slug.get(s.strip(), s.strip())) for s in env.split(",")]
 
-FIELDS = ["phone", "phone2", "city", "price_per_day_rub", "rooms", "area_m2",
+FIELDS = ["phone", "phone2", "city", "price_rub", "rooms", "area_m2",
           "floor", "floors_total", "address", "metro", "build_year", "furniture",
           "deposit", "owner_id", "posted", "description", "url"]
 
@@ -165,7 +175,7 @@ def row_of(o, fallback_city):
     return {
         "phone": phones[0], "phone2": phones[1] if len(phones) > 1 else "",
         "city": _geo_city(o) or fallback_city,
-        "price_per_day_rub": bt.get("priceRur") or o.get("formattedFullPrice") or "",
+        "price_rub": bt.get("priceRur") or o.get("formattedFullPrice") or "",
         "rooms": o.get("roomsCount") or o.get("bedroomsCount") or "",
         "area_m2": o.get("totalArea") or "", "floor": o.get("floorNumber") or "",
         "floors_total": o.get("floorsCount") or "", "address": addr, "metro": _metro(o),
@@ -192,7 +202,7 @@ def main():
               '  PROXY="http://user:pass@host:port" python cian_parser.py')
     rows = {}
     for slug, city in _cities():
-        base = f"https://{slug}.cian.ru/snyat-kvartiru-posutochno/"
+        base = f"https://{slug}.cian.ru/{CIAN_PATH}/"
         new = 0
         for srt in SORTS:
             for pg in range(1, PAGES + 1):

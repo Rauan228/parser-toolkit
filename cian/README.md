@@ -1,8 +1,11 @@
-# CIAN daily-rent parser
+# CIAN listings parser
 
-Pulls daily-rent apartment listings **with open owner phones** from CIAN by
-parsing the server-rendered JSON state (`"offers":[…]`) embedded in the search
-page. No API key, no CAPTCHA, no "reveal phone" — the phones are already there.
+Pulls real-estate listings **with open owner phones** from CIAN by parsing the
+server-rendered JSON state (`"offers":[…]`) embedded in the search page. No API
+key, no CAPTCHA, no "reveal phone" — the phones are already there.
+
+Works on **any CIAN section** via `CIAN_PATH` — the phones live in the same JSON
+state regardless of listing type.
 
 ## Requirements
 - Python 3.8+ (stdlib only)
@@ -11,18 +14,28 @@ page. No API key, no CAPTCHA, no "reveal phone" — the phones are already there
 
 ## Run
 ```bash
-PROXY="http://user:pass@host:port" python cian_parser.py
+PROXY="http://user:pass@host:port" CIAN_PATH="snyat-kvartiru-posutochno" python cian_parser.py
 ```
 
 | Env | Default | Meaning |
 |---|---|---|
 | `PROXY` | — | `http://user:pass@host:port`, **RU proxy (required)** |
+| `CIAN_PATH` | `snyat-kvartiru-posutochno` | CIAN search section (see below) |
 | `CITIES` | 24 major cities | comma-separated CIAN subdomains (`www` = Moscow) |
 | `PAGES` | `5` | pages per sort order |
-| `OUT` | `cian_daily_rent` | output filename (`.csv` / `.json`) |
+| `OUT` | `cian_listings` | output filename (`.csv` / `.json`) |
+
+### CIAN_PATH options
+| Value | Section |
+|---|---|
+| `snyat-kvartiru-posutochno` | daily rent (default) |
+| `snyat-kvartiru` | long-term rent |
+| `kupit-kvartiru` | buy apartment |
+| `kupit-dom` | buy house |
+| `snyat-pomeshchenie` | commercial rent |
 
 ## Output
-`phone, phone2, city, price_per_day_rub, rooms, area_m2, floor, floors_total, address, metro, build_year, furniture, deposit, owner_id, posted, description, url`
+`phone, phone2, city, price_rub, rooms, area_m2, floor, floors_total, address, metro, build_year, furniture, deposit, owner_id, posted, description, url`
 
 The parser only keeps cards with a resolved address (guards against truncated
 proxy responses) and de-duplicates by phone.

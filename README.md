@@ -1,22 +1,25 @@
-# 🏘️ parser-toolkit
+# 🧰 parser-toolkit
 
-> A small collection of real-estate lead parsers for the Russian market — pull daily-rent apartment listings **with open owner phone numbers** from CIAN, 2GIS and Yandex Maps.
+> Ready-to-run parsers for three big Russian platforms — **2GIS**, **Yandex Maps** and **CIAN**. Pull listings and business data **with open public phone numbers** into clean CSV + JSON. You decide what to collect.
 
 [Русская версия →](README.ru.md)
 
-Each parser targets a source where contact phones are **publicly available** (no CAPTCHA, no "reveal phone" wall) and outputs clean **CSV + JSON** ready for a CRM or a sales team.
+Each parser targets a source where contact phones are **publicly available** (no CAPTCHA, no "reveal phone" wall). Search **any** category — restaurants, car services, clinics, gyms, real estate, whatever — the parsers don't assume a niche.
 
 ---
 
 ## 📦 What's inside
 
-| Parser | Source | Method | Phones | Proxy | API key |
+| Parser | Source | Collects | Method | Proxy | API key |
 |---|---|---|---|---|---|
-| [`cian/`](cian/) | [CIAN](https://cian.ru) daily rent | Direct HTTP (embedded JSON state) | ✅ open | 🇷🇺 RU proxy required | — |
-| [`2gis/`](2gis/) | [2GIS](https://2gis.ru) directory | Apify actor | ✅ open | — (Apify's own) | Apify token |
-| [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) directory | Apify actor | ✅ open | — (Apify's own) | Apify token |
+| [`2gis/`](2gis/) | [2GIS](https://2gis.ru) | any business category | Apify actor | — (Apify's own) | Apify token |
+| [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Apify actor | — (Apify's own) | Apify token |
+| [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP (embedded JSON) | 🇷🇺 RU proxy required | — |
 
-All three return **different, complementary datasets** — run all of them and de-duplicate by phone for maximum coverage.
+- **2GIS / Yandex Maps** are business directories — feed them any search query and a list of cities.
+- **CIAN** is a real-estate platform — point it at any section (rent, sale, daily rent, commercial…) via one env var.
+
+The three sources return **different, complementary datasets** — run them all and de-duplicate by phone for maximum coverage.
 
 ---
 
@@ -28,42 +31,39 @@ cd parser-toolkit
 pip install -r requirements.txt   # stdlib-only, but here for completeness
 ```
 
-### 1. CIAN — direct parser (needs a Russian proxy)
+### 2GIS — via Apify (token, no proxy)
+
+```bash
+APIFY_TOKEN="apify_api_..." QUERY="кофейни" CITIES="moscow,spb" python 2gis/twogis_parser.py
+```
+`QUERY` — anything: `рестораны`, `автосервис`, `стоматология`, `квартиры посуточно`, …
+
+### Yandex Maps — via Apify (token, no proxy)
+
+```bash
+APIFY_TOKEN="apify_api_..." QUERY="барбершоп" CITIES="Москва,Сочи" python yandex-maps/yandex_maps_parser.py
+```
+
+### CIAN — direct parser (needs a Russian proxy)
 
 CIAN geo-blocks non-RU IPs and sends headless clients to a decoy page, so a
 **Russian residential/mobile proxy** is required.
 
 ```bash
-PROXY="http://user:pass@host:port" python cian/cian_parser.py
+PROXY="http://user:pass@host:port" CIAN_PATH="snyat-kvartiru-posutochno" python cian/cian_parser.py
 ```
-
-Optional env: `CITIES="www,spb,sochi"` (www = Moscow), `PAGES=5`, `OUT=my_leads`.
-
-### 2. 2GIS — via Apify (needs a token, no proxy)
-
-```bash
-APIFY_TOKEN="apify_api_..." python 2gis/twogis_parser.py
-```
-
-Optional env: `CITIES="moscow,spb,sochi"`, `MAX=500`, `OUT=my_leads`.
-
-### 3. Yandex Maps — via Apify (needs a token, no proxy)
-
-```bash
-APIFY_TOKEN="apify_api_..." python yandex-maps/yandex_maps_parser.py
-```
-
-Optional env: `QUERIES="квартиры посуточно"`, `CITIES="Москва,Сочи"`, `MAX=200`.
+`CIAN_PATH` — any section: `snyat-kvartiru` (long-term rent), `kupit-kvartiru` (buy),
+`kupit-dom`, `snyat-pomeshchenie` (commercial), … Default is daily rent.
 
 ---
 
 ## 📋 Output fields
 
-**CIAN** (richest): `phone, phone2, city, price_per_day_rub, rooms, area_m2, floor, floors_total, address, metro, build_year, furniture, deposit, owner_id, posted, description, url`
-
 **2GIS**: `phone, name, city, address, category, url`
 
 **Yandex Maps**: `phone, phone2, name, city, address, rating, latitude, longitude, url`
+
+**CIAN**: `phone, phone2, city, price_rub, rooms, area_m2, floor, floors_total, address, metro, build_year, furniture, deposit, owner_id, posted, description, url`
 
 CSV is written with a UTF-8 BOM so Cyrillic opens correctly in Excel.
 
@@ -78,16 +78,30 @@ CSV is written with a UTF-8 BOM so Cyrillic opens correctly in Excel.
 
 ## ⚙️ How it works
 
-- **CIAN** parses the server-rendered JSON state embedded in the search page (`"offers":[…]`) and pulls the balanced array out directly — the phones already live in that state, no reveal click needed. A retry loop guards against proxies truncating the (large) response.
-- **2GIS / Yandex Maps** drive public Apify actors that walk the directory listings; both directories publish business phones by design.
+- **2GIS / Yandex Maps** drive public Apify actors that walk directory results for your query; both directories publish business phones by design. Configure by `QUERY` + `CITIES`, or (2GIS) point at exact rubric URLs via `START_URLS`.
+- **CIAN** parses the server-rendered JSON state embedded in the search page (`"offers":[…]`) and pulls the balanced array out directly — the phones already live in that state, no reveal click needed. A retry loop guards against proxies truncating the (large) response. Any CIAN section works via `CIAN_PATH`.
+
+---
+
+## ⚙️ Common env vars
+
+| Var | Parsers | Meaning |
+|---|---|---|
+| `APIFY_TOKEN` | 2gis, yandex-maps | Apify API token |
+| `PROXY` | cian | `http://user:pass@host:port` (RU proxy) |
+| `QUERY` | 2gis, yandex-maps | search text (any category) |
+| `CITIES` | all | comma-separated cities |
+| `CIAN_PATH` | cian | CIAN search section |
+| `MAX` / `PAGES` | — | volume per city |
+| `OUT` | all | output filename |
 
 ---
 
 ## ⚠️ Notes & disclaimer
 
-- Data comes from **public listings/directories**. Use it responsibly and in line with each source's Terms of Service and your local data-protection laws (e.g. personal-data regulations).
-- Sources change their markup/rubrics over time — selectors and rubric IDs may need occasional updates.
-- This toolkit is for legitimate lead-generation and research. You are responsible for how you use the collected data.
+- Data comes from **public listings/directories**. Use it responsibly and in line with each source's Terms of Service and your local data-protection laws.
+- Sources change their markup/rubrics over time — selectors and paths may need occasional updates.
+- This toolkit is for legitimate data collection and research. You are responsible for how you use the collected data.
 
 ---
 

@@ -7,10 +7,14 @@ venv/
 env/
 
 # Output data (don't commit scraped leads)
+output/
 *.csv
 *.json
 !package.json
 !**/schema.json
+# Keep unit-test fixtures
+!tests/fixtures/
+!tests/fixtures/**/*.json
 
 # OS / editor
 .DS_Store

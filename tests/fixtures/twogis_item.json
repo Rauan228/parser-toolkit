@@ -1,0 +1,51 @@
+{
+  "id": "70000001114075799",
+  "name": "Humbl cookies, кофейня",
+  "address_name": "Ходынский бульвар, 4",
+  "full_address_name": "Москва, Ходынский бульвар, 4",
+  "point": {
+    "lat": 55.790585,
+    "lon": 37.530263
+  },
+  "contact_groups": [
+    {
+      "contacts": [
+        {
+          "type": "phone",
+          "value": "+79850385588",
+          "text": "+7-985-038-55-88"
+        },
+        {
+          "type": "email",
+          "value": "info@humbl.ru"
+        },
+        {
+          "type": "website",
+          "value": "http://humbl.ru",
+          "url": "http://humbl.ru"
+        }
+      ]
+    }
+  ],
+  "rubrics": [
+    {
+      "id": "162",
+      "name": "Кофейни"
+    }
+  ],
+  "reviews": {
+    "general_rating": 4.7,
+    "general_review_count": 41
+  },
+  "org": {
+    "id": "70000001114075798",
+    "name": "Humbl cookies, кофейня"
+  },
+  "adm_div": [
+    {
+      "type": "city",
+      "name": "Москва",
+      "city_alias": "moscow"
+    }
+  ]
+}

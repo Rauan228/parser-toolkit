@@ -1,2 +1,5 @@
-# All three parsers use only the Python standard library (urllib, json, csv, gzip, ssl).
-# Python 3.8+ is enough — no external dependencies required.
+# All parsers use only the Python standard library
+# (urllib, json, csv, ssl, argparse, unittest, …).
+# Python 3.8+ is enough — no third-party packages required.
+#
+# No Apify SDK. No Playwright/Selenium. No paid API clients.

@@ -1,0 +1,107 @@
+{
+  "type": "business",
+  "title": "Coffee First",
+  "address": "ул. Крымский Вал, 8",
+  "coordinates": [
+    37.608663,
+    55.731355
+  ],
+  "id": "171967858844",
+  "seoname": "coffee_first",
+  "phones": [
+    {
+      "number": "+7 (933) 404-43-75",
+      "type": "phone",
+      "value": "+79334044375"
+    }
+  ],
+  "ratingData": {
+    "ratingCount": 1197,
+    "ratingValue": 4.699999809265137,
+    "reviewCount": 804
+  },
+  "categories": [
+    {
+      "id": "35193114937",
+      "name": "Кофейня",
+      "class": "cafe",
+      "seoname": "coffee_shop",
+      "pluralName": "Кофейни"
+    },
+    {
+      "id": "184106390",
+      "name": "кафе",
+      "class": "cafe",
+      "seoname": "cafe",
+      "pluralName": "Кафе"
+    }
+  ],
+  "urls": [
+    "http://taplink.cc/coffeefirst_moscow?yclid=481932155040038911&utm_content=15790909431&utm_source=geoadv_maps"
+  ],
+  "region": {
+    "id": 213,
+    "type": 6,
+    "capitalId": 0,
+    "hierarchy": [
+      225,
+      1,
+      213
+    ],
+    "seoname": "moscow",
+    "bounds": [
+      [
+        37.0354885,
+        55.31406179935764
+      ],
+      [
+        38.1999115,
+        56.192715799357636
+      ]
+    ],
+    "longitude": 37.6177,
+    "latitude": 55.755863,
+    "zoom": 10,
+    "names": {
+      "ablative": "",
+      "accusative": "Москву",
+      "dative": "Москве",
+      "directional": "",
+      "genitive": "Москвы",
+      "instrumental": "Москвой",
+      "locative": "",
+      "nominative": "Москва",
+      "preposition": "в",
+      "prepositional": "Москве"
+    }
+  },
+  "country": "Россия",
+  "fullAddress": "Москва, улица Крымский Вал, 8",
+  "compositeAddress": {
+    "country": "Россия",
+    "locality": "Москва",
+    "street": "улица Крымский Вал",
+    "house": "8"
+  },
+  "workingTimeText": "пн-пт 07:30–23:00; сб,вс 08:30–23:00",
+  "socialLinks": [
+    {
+      "type": "whatsapp",
+      "href": "https://wa.me/79850261755?text=%D0%9E%D0%B1%D1%80%D0%B0%D1%89%D0%B5%D0%BD%D0%B8%D0%B5+%E2%84%96B17100030+%D0%B8%D0%B7+%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81+%D0%9A%D0%B0%D1%80%D1%82%0A%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!+%D0%9C%D0%B5%D0%BD%D1%8F+%D0%B7%D0%B0%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D0%BE%D0%B2%D0%B0%D0%BB%D0%BE+%D0%B2%D0%B0%D1%88%D0%B5+%D0%BF%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5",
+      "readableHref": "+79850261755"
+    },
+    {
+      "type": "telegram",
+      "href": "https://t.me/+79850261755",
+      "readableHref": "@+79850261755"
+    },
+    {
+      "type": "telegram",
+      "href": "https://t.me/coffeefirst_moscow",
+      "readableHref": "@coffeefirst_moscow"
+    }
+  ],
+  "businessLinks": [],
+  "uri": "ymapsbm1://org?oid=171967858844",
+  "description": "ул. Крымский Вал, 8"
+}

@@ -20,6 +20,7 @@ Currently implemented with Python stdlib only.
 | [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Direct HTTP / Embedded JSON (search HTML) | optional | Not required |
 | [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP / Embedded JSON | 🇷🇺 RU proxy required | Not required |
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | any real-estate section (KZ) | Direct HTTP / HTML list + `window.data` | optional | Not required |
+| [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | auto listings (KZ) | Direct HTTP + Playwright (phones/reCAPTCHA) | optional | Not required |
 
 Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/JSON writers).
 
@@ -27,6 +28,7 @@ Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/J
 - **CIAN / Krisha** — real estate listings (RU / KZ).
 - **2GIS** uses the web key exposed by the 2GIS frontend; no user-provided API key is required.
 - **Krisha** full phones need an optional logged-in browser cookie (`KRISHA_COOKIE`); metadata works without it.
+- **Kolesa** phones need Playwright (reCAPTCHA v3 runs in a real browser click flow); optional `KOLESA_COOKIE`.
 
 ---
 
@@ -76,12 +78,27 @@ KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
 > full number is already in the page JSON (`window.data` → `adverts[].phones`).
 > The parser reads that — no captcha, no click simulation.
 
+### Kolesa.kz — autos (HTTP + Playwright phones)
+
+```bash
+pip install playwright
+playwright install chromium
+
+# phones are ON by default (Playwright clicks «Показать телефон»)
+KOLESA_COOKIE="klssid=…; kumd=…; …" \
+  python kolesa/kolesa_parser.py --city almaty --pages 1 --max 15 --out output/kolesa
+```
+
+Phones API: `GET app.kolesa.kz/adverts/{id}/phones?captchaTokenV3=…&source=advert`  
+(token is produced inside Chromium — not hard-coded, not cracked).
+
 Outputs default under `output/`:
 
 ```
 output/twogis_places.json
 output/yandex_maps_places.json
 output/krisha_listings.json
+output/kolesa_listings.json
 ```
 
 ---
@@ -156,6 +173,7 @@ CSV is UTF-8 with BOM for Excel.
 - **Yandex Maps** — fetches public search HTML and parses the SPA hydration JSON at `stack[0].results.items[]`; paginates with `?page=N`. Domain fallback (`yandex.ru` → `yandex.kz` → …) if a host returns `429 limited`.
 - **CIAN** — slices the balanced `"offers":[…]` array from server-rendered page state.
 - **Krisha** — list HTML (`data-product-id`) + detail `window.data`; phones via `/a/ajaxPhones?id=` (login session cookie when Krisha requires auth).
+- **Kolesa** — list/detail over HTTP; phones via Playwright intercept of `app.kolesa.kz/adverts/{id}/phones` (reCAPTCHA v3 in browser).
 
 ---
 
@@ -173,6 +191,8 @@ CSV is UTF-8 with BOM for Excel.
 | `YANDEX_DOMAINS` | yandex-maps | Maps host fallback list |
 | `KRISHA_COOKIE` / `--cookie` | krisha | browser session cookie for full phones |
 | `--deal` `--type` | krisha | e.g. `arenda` / `kvartiry` |
+| `KOLESA_COOKIE` / `--cookie` | kolesa | browser session cookie (recommended) |
+| `--no-phones` | kolesa | metadata only (phones required by default) |
 
 ---
 

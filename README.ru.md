@@ -18,11 +18,13 @@
 | [`yandex-maps/`](yandex-maps/) | [Яндекс.Карты](https://yandex.ru/maps) | любые категории бизнеса | Direct HTTP / Embedded JSON (search HTML) | опционально | Not required |
 | [`cian/`](cian/) | [ЦИАН](https://cian.ru) | любой раздел недвижимости | Direct HTTP / Embedded JSON | 🇷🇺 нужен RU-прокси | Not required |
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | недвижимость KZ | Direct HTTP / HTML list + `window.data` | опционально | Not required |
+| [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | авто KZ | Direct HTTP + Playwright (телефоны/reCAPTCHA) | опционально | Not required |
 
 Общие хелперы — в [`core/`](core/) (HTTP-клиент, единая модель place, запись CSV/JSON).
 
 - **2ГИС** использует web-ключ, который отдаёт frontend 2ГИС; **пользовательский API key не нужен**.
 - **Krisha**: полные телефоны — через cookie залогиненной сессии (`KRISHA_COOKIE`); метаданные доступны без логина.
+- **Kolesa**: телефоны через Playwright (reCAPTCHA v3 в реальном браузере); cookie `KOLESA_COOKIE` желательна.
 
 ---
 
@@ -68,6 +70,16 @@ KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
 > UI показывает «Показать телефон», но при логине полный номер уже лежит в
 > `window.data` → `adverts[].phones`. Парсер читает его оттуда, без капчи.
 
+### Kolesa.kz
+
+```bash
+pip install playwright && playwright install chromium
+KOLESA_COOKIE="klssid=…; kumd=…" \
+  python kolesa/kolesa_parser.py --city almaty --max 15 --out output/kolesa
+```
+
+Телефоны: `app.kolesa.kz/adverts/{id}/phones` + `captchaTokenV3` из Chromium.
+
 Результаты по умолчанию в `output/`.
 
 ---
@@ -84,6 +96,7 @@ KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
 - **Яндекс.Карты** — публичные HTML-страницы поиска + embedded JSON (`stack[0].results.items[]`), пагинация `?page=N`. Fallback доменов при `429 limited`.
 - **ЦИАН** — embedded `"offers":[…]` в HTML выдачи.
 - **Krisha** — list HTML + detail `window.data`; телефоны через `/a/ajaxPhones` (нужна cookie сессии, если Krisha требует логин).
+- **Kolesa** — list/detail по HTTP; телефоны через Playwright + `app.kolesa.kz/adverts/{id}/phones` (reCAPTCHA v3 в браузере).
 
 ---
 

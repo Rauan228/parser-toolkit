@@ -1,6 +1,8 @@
-# Currently the toolkit runs on the Python standard library only
-# (urllib, json, csv, ssl, argparse, unittest, …).
-# Python 3.8+ is enough — no third-party packages required yet.
+# Core toolkit runs on the Python standard library for most parsers.
+# Python 3.8+.
 #
-# Positioning: No Apify. No browser automation. Local direct HTTP.
-# (If a future parser needs a dependency, add it here without changing that.)
+# Positioning: No Apify. No captcha cracking. Local direct HTTP.
+# (Optional browser only where a site requires reCAPTCHA for phones.)
+
+# Optional — required for Kolesa.kz full phone collection:
+playwright>=1.40.0

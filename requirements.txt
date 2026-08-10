@@ -1,0 +1,2 @@
+# All three parsers use only the Python standard library (urllib, json, csv, gzip, ssl).
+# Python 3.8+ is enough — no external dependencies required.

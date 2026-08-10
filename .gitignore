@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Output data (don't commit scraped leads)
+*.csv
+*.json
+!package.json
+!**/schema.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Secrets — never commit tokens/proxies
+.env
+*.env
+secrets.*

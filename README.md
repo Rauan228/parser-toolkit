@@ -1,14 +1,16 @@
 # 🧰 parser-toolkit
 
-> Ready-to-run parsers for popular CIS/RU platforms — **2GIS**, **Yandex Maps**, **CIAN** and **Krisha.kz**. Pull listings and business data into clean CSV + JSON. You decide what to collect.
+> Ready-to-run local parsers for popular CIS/RU platforms — directories, marketplaces and real estate.
 
 [Русская версия →](README.ru.md)
 
-Directory parsers (2GIS / Yandex) collect **public business phones**. Real-estate parsers collect listing metadata; phone rules depend on the site (CIAN phones are open in page state; Krisha full phones need a logged-in browser session — see below).
+Covers **2GIS**, **Yandex Maps**, **CIAN**, **Krisha.kz** and **Kolesa.kz**. Pull listings and business data into clean CSV + JSON. You decide what to collect.
 
-**No Apify. No browser automation. Parsers run locally over direct HTTP.**
+Directory parsers (2GIS / Yandex) collect **public business phones**. Real-estate / marketplace parsers collect listing metadata; phone rules depend on the site (CIAN phones are open in page state; Krisha needs a logged-in cookie; Kolesa needs Playwright for the reCAPTCHA phone flow — see below).
 
-Currently implemented with Python stdlib only.
+**No Apify. Parsers run locally, primarily over direct HTTP. Browser automation is used only where the source requires it.**
+
+Currently implemented with Python stdlib + optional Playwright for Kolesa phone extraction.
 
 ---
 
@@ -37,7 +39,8 @@ Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/J
 ```bash
 git clone https://github.com/Rauan228/parser-toolkit.git
 cd parser-toolkit
-pip install -r requirements.txt   # optional for now (stdlib is enough)
+pip install -r requirements.txt   # stdlib for most parsers; Playwright for Kolesa phones
+playwright install chromium       # only needed for kolesa/
 ```
 
 ### 2GIS — Direct HTTP / Internal Catalog Web API
@@ -164,6 +167,7 @@ CSV is UTF-8 with BOM for Excel.
 | Yandex Maps | no user API key (optional proxy if your IP is rate-limited) |
 | CIAN | Russian residential/mobile proxy |
 | Krisha.kz | no user API key; optional `KRISHA_COOKIE` for full phones |
+| Kolesa.kz | Playwright + Chromium; optional `KOLESA_COOKIE` for session-dependent phone flow |
 
 ---
 

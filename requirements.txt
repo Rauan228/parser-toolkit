@@ -1,8 +1,8 @@
-# Core toolkit runs on the Python standard library for most parsers.
-# Python 3.8+.
+# Most parsers: Python standard library only (Python 3.8+).
 #
-# Positioning: No Apify. No captcha cracking. Local direct HTTP.
-# (Optional browser only where a site requires reCAPTCHA for phones.)
-
+# Positioning:
+#   No Apify. Parsers run locally, primarily over direct HTTP.
+#   Browser automation only where the source requires it.
+#
 # Optional — required for Kolesa.kz full phone collection:
 playwright>=1.40.0

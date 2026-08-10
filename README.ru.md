@@ -1,12 +1,14 @@
 # 🧰 parser-toolkit
 
-> Готовые парсеры для популярных платформ СНГ/РФ — **2ГИС**, **Яндекс.Карты**, **ЦИАН** и **Krisha.kz**. Собирают объявления и данные организаций/недвижимости в чистые CSV + JSON.
+> Готовые локальные парсеры для популярных платформ СНГ/РФ — справочники, маркетплейсы и недвижимость.
 
 [English version →](README.md)
 
-**Без Apify. Без browser automation. Парсеры запускаются локально по прямому HTTP.**
+**2ГИС**, **Яндекс.Карты**, **ЦИАН**, **Krisha.kz** и **Kolesa.kz**. Собирают объявления и данные организаций/листингов в чистые CSV + JSON.
 
-Сейчас реализация — только Python stdlib.
+**Без Apify. Парсеры запускаются локально, в основном по прямому HTTP. Browser automation — только там, где источник этого требует.**
+
+Сейчас: Python stdlib + опциональный Playwright для телефонов Kolesa.
 
 ---
 
@@ -33,7 +35,8 @@
 ```bash
 git clone https://github.com/Rauan228/parser-toolkit.git
 cd parser-toolkit
-pip install -r requirements.txt
+pip install -r requirements.txt   # stdlib для большинства; Playwright для телефонов Kolesa
+playwright install chromium       # только для kolesa/
 ```
 
 ### 2ГИС
@@ -87,6 +90,18 @@ KOLESA_COOKIE="klssid=…; kumd=…" \
 ## 📋 Поля (справочники)
 
 Единый JSON-формат: `source`, `name`, `category`, `phones[]`, `address`, `city`, `latitude`, `longitude`, `rating`, `reviews_count`, `website`, `url`, плюс `raw`/`metadata` для специфики источника.
+
+---
+
+## 🔑 Что понадобится
+
+| Источник | Нужно |
+|---|---|
+| 2ГИС | без user API key (web-ключ frontend 2gis.ru) |
+| Яндекс.Карты | без user API key (при 429 — другой IP/прокси) |
+| ЦИАН | RU residential/mobile proxy |
+| Krisha.kz | без user API key; опционально `KRISHA_COOKIE` для полных телефонов |
+| Kolesa.kz | Playwright + Chromium; опционально `KOLESA_COOKIE` для session-зависимого phone flow |
 
 ---
 

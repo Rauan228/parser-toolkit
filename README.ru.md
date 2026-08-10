@@ -22,7 +22,7 @@
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | недвижимость KZ | Direct HTTP / HTML list + `window.data` | опционально | Not required |
 | [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | авто KZ | Direct HTTP + Playwright (телефоны/reCAPTCHA) | опционально | Not required |
 
-Общие хелперы — в [`core/`](core/) (HTTP-клиент, единая модель place, запись CSV/JSON).
+Устанавливаемый Python-пакет (`parser_toolkit`) и единый CLI. Общие хелперы: HTTP-клиент, модель place, CSV/JSON. Старые shim-скрипты в `2gis/`, `yandex-maps/`, … тоже работают.
 
 - **2ГИС** использует web-ключ, который отдаёт frontend 2ГИС; **пользовательский API key не нужен**.
 - **Krisha**: полные телефоны — через cookie залогиненной сессии (`KRISHA_COOKIE`); метаданные доступны без логина.
@@ -35,39 +35,57 @@
 ```bash
 git clone https://github.com/Rauan228/parser-toolkit.git
 cd parser-toolkit
-pip install -r requirements.txt   # stdlib для большинства; Playwright для телефонов Kolesa
-playwright install chromium       # только для kolesa/
+pip install -e .
+
+# одна команда → CSV + JSON
+parser-toolkit 2gis --query "кофейни" --city moscow --max 50
+# алиасы: ptk …   или   python -m parser_toolkit …
+```
+
+Телефоны Kolesa (опционально):
+
+```bash
+pip install -e ".[kolesa]"
+playwright install chromium
+```
+
+```text
+pip install
+  → одна команда (parser-toolkit / ptk / python -m parser_toolkit)
+  → CSV + JSON в output/
+  → понятные ошибки в stderr + ненулевой exit code
+  → unit-тесты (только фикстуры)
 ```
 
 ### 2ГИС
 
 ```bash
-python 2gis/twogis_parser.py --query "стоматология" --city moscow --city spb --max 100
+parser-toolkit 2gis --query "стоматология" --city moscow --city spb --max 100
 ```
 
 ### Яндекс.Карты
 
 ```bash
-python yandex-maps/yandex_maps_parser.py --query "стоматология" --city "Астана" --max 50
+parser-toolkit yandex-maps --query "стоматология" --city "Астана" --max 50
 ```
 
 ### ЦИАН
 
 ```bash
-PROXY="http://user:pass@host:port" CIAN_PATH="snyat-kvartiru-posutochno" python cian/cian_parser.py
+parser-toolkit cian --proxy "http://user:pass@host:port" --path snyat-kvartiru-posutochno --pages 3
 ```
 
 ### Krisha.kz
 
 ```bash
 # метаданные + превью телефона
-python krisha/krisha_parser.py --deal arenda --type kvartiry --city almaty --pages 2
+parser-toolkit krisha --deal arenda --type kvartiry --city almaty --pages 2
 
 # полные телефоны — cookie залогиненной сессии krisha.kz
 # DevTools → /a/show/… → Network → document → Cookie
 # нужны krssid + kumd (не Google Ads)
 KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
-  python krisha/krisha_parser.py --deal prodazha --type kvartiry --city astana --max 30
+  parser-toolkit krisha --deal prodazha --type kvartiry --city astana --max 30
 ```
 
 > UI показывает «Показать телефон», но при логине полный номер уже лежит в
@@ -76,14 +94,19 @@ KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
 ### Kolesa.kz
 
 ```bash
-pip install playwright && playwright install chromium
 KOLESA_COOKIE="klssid=…; kumd=…" \
-  python kolesa/kolesa_parser.py --city almaty --max 15 --out output/kolesa
+  parser-toolkit kolesa --city almaty --max 15 --out output/kolesa
 ```
 
 Телефоны: `app.kolesa.kz/adverts/{id}/phones` + `captchaTokenV3` из Chromium.
 
 Результаты по умолчанию в `output/`.
+
+```bash
+parser-toolkit --help
+parser-toolkit 2gis --help
+parser-toolkit --version
+```
 
 ---
 
@@ -121,10 +144,11 @@ KOLESA_COOKIE="klssid=…; kumd=…" \
 python -m unittest discover -s tests -v
 ```
 
-Только фикстуры, без сетевых запросов.
+Только фикстуры, без сетевых запросов. Ошибки CLI — в **stderr**, ненулевой exit code.
 
 ---
 
 ## 📄 Лицензия
 
-[MIT](LICENSE) — автор [@Rauan228](https://github.com/Rauan228).
+[MIT](LICENSE) — автор [@Rauan228](https://github.com/Rauan228).  
+Релизные заметки: [CHANGELOG.md](CHANGELOG.md) (`v0.1.0`).

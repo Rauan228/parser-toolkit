@@ -8,9 +8,9 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "2gis"))
+sys.path.insert(0, str(ROOT))
 
-import twogis_parser as tg  # noqa: E402
+from parser_toolkit.parsers import twogis as tg  # noqa: E402
 
 FIXTURE = ROOT / "tests" / "fixtures" / "twogis_item.json"
 
@@ -56,7 +56,6 @@ class TestTwoGisNormalize(unittest.TestCase):
 
 class TestPaginationHelpers(unittest.TestCase):
     def test_page_size_cap(self):
-        # module constant is capped at 50 by design
         self.assertLessEqual(tg.PAGE_SIZE, 50)
 
 

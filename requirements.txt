@@ -1,8 +1,11 @@
-# Most parsers: Python standard library only (Python 3.8+).
+# Install the package (recommended):
+#   pip install -e .
+#   pip install -e ".[kolesa]"   # + Playwright for Kolesa phones
+#   playwright install chromium
 #
-# Positioning:
-#   No Apify. Parsers run locally, primarily over direct HTTP.
-#   Browser automation only where the source requires it.
+# Or bare deps:
+#   pip install -r requirements.txt
 #
-# Optional — required for Kolesa.kz full phone collection:
+# Most parsers need only the stdlib. Playwright is optional.
+
 playwright>=1.40.0

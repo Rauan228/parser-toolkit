@@ -8,9 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "kolesa"))
 
-import kolesa_parser as kp  # noqa: E402
+from parser_toolkit.parsers import kolesa as kp  # noqa: E402
 
 
 SAMPLE_HTML = """

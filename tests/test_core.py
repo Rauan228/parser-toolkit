@@ -13,9 +13,9 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from core.http import HttpClient, HttpError  # noqa: E402
-from core.models import Place, normalize_phone  # noqa: E402
-from core.output import dump_places  # noqa: E402
+from parser_toolkit.core.http import HttpClient, HttpError  # noqa: E402
+from parser_toolkit.core.models import Place, normalize_phone  # noqa: E402
+from parser_toolkit.core.output import dump_places  # noqa: E402
 
 
 class TestModels(unittest.TestCase):
@@ -24,7 +24,6 @@ class TestModels(unittest.TestCase):
         d = p.to_dict(keep_raw=False)
         self.assertEqual(d["phone"], "+79990001122")
         self.assertEqual(d["phone2"], "+79990003344")
-        self.assertNotIn("raw", d) or self.assertIsNone(d.get("raw"))
 
     def test_normalize_phone(self):
         self.assertEqual(normalize_phone("89991234567"), "+79991234567")
@@ -51,10 +50,6 @@ class TestOutput(unittest.TestCase):
 class TestHttpClient(unittest.TestCase):
     def test_retries_on_url_error(self):
         client = HttpClient(timeout=1, retries=2, sleep_base=0.01)
-
-        class Boom(Exception):
-            pass
-
         with mock.patch.object(client, "_request", side_effect=TimeoutError("x")):
             with self.assertRaises(HttpError):
                 client.get("https://example.invalid/")

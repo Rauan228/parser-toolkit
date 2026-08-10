@@ -9,9 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "krisha"))
 
-import krisha_parser as kp  # noqa: E402
+from parser_toolkit.parsers import krisha as kp  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures"
 
@@ -24,7 +23,6 @@ class TestExtractors(unittest.TestCase):
         self.assertTrue(ids[0].isdigit())
 
     def test_window_data_from_fixture_json(self):
-        # fixture is already parsed advert blob; wrap as script for extractor
         data = json.loads((FIX / "krisha_jsdata.json").read_text(encoding="utf-8"))
         html = f'<script id="jsdata">window.data = {json.dumps(data, ensure_ascii=False)};</script>'
         parsed = kp.extract_window_data(html)
@@ -56,7 +54,6 @@ class TestNormalize(unittest.TestCase):
             keep_raw=True,
         )
         self.assertEqual(row["source"], "krisha")
-        # logged-in SSR embeds full phones in adverts[].phones
         self.assertTrue(str(row["phone"]).startswith("+7"))
         self.assertIn("778", row["phone"])
         self.assertTrue(row["title"])

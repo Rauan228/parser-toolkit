@@ -24,7 +24,7 @@ Currently implemented with Python stdlib + optional Playwright for Kolesa phone 
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | any real-estate section (KZ) | Direct HTTP / HTML list + `window.data` | optional | Not required |
 | [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | auto listings (KZ) | Direct HTTP + Playwright (phones/reCAPTCHA) | optional | Not required |
 
-Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/JSON writers).
+Installable Python package (`parser_toolkit`) with a single CLI. Shared helpers: HTTP client, place model, CSV/JSON writers. Thin shims under `2gis/`, `yandex-maps/`, … still work for the old `python path/to_parser.py` style.
 
 - **2GIS / Yandex Maps** — business directories: any query + list of cities.
 - **CIAN / Krisha** — real estate listings (RU / KZ).
@@ -39,42 +39,60 @@ Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/J
 ```bash
 git clone https://github.com/Rauan228/parser-toolkit.git
 cd parser-toolkit
-pip install -r requirements.txt   # stdlib for most parsers; Playwright for Kolesa phones
-playwright install chromium       # only needed for kolesa/
+pip install -e .
+
+# one command → CSV + JSON
+parser-toolkit 2gis --query "кофейни" --city moscow --max 50
+# aliases: ptk …   or   python -m parser_toolkit …
+```
+
+Kolesa phones (optional extra):
+
+```bash
+pip install -e ".[kolesa]"
+playwright install chromium
+```
+
+```text
+pip install
+  → one command (parser-toolkit / ptk / python -m parser_toolkit)
+  → CSV + JSON under output/
+  → clear errors on stderr + non-zero exit codes
+  → unit tests (fixtures only)
 ```
 
 ### 2GIS — Direct HTTP / Internal Catalog Web API
 
 ```bash
-python 2gis/twogis_parser.py --query "стоматология" --city moscow --city spb --max 100
-# or env-style:
-QUERY="кофейни" CITIES="moscow,spb" python 2gis/twogis_parser.py
+parser-toolkit 2gis --query "стоматология" --city moscow --city spb --max 100
+# env-style still works:
+QUERY="кофейни" CITIES="moscow,spb" parser-toolkit 2gis
 ```
 
 ### Yandex Maps — Direct HTTP / Embedded JSON
 
 ```bash
-python yandex-maps/yandex_maps_parser.py --query "стоматология" --city "Астана" --max 50
-QUERY="барбершоп" CITIES="Москва,Сочи" python yandex-maps/yandex_maps_parser.py
+parser-toolkit yandex-maps --query "стоматология" --city "Астана" --max 50
+QUERY="барбершоп" CITIES="Москва,Сочи" parser-toolkit yandex-maps
 ```
 
 ### CIAN — Direct HTTP / Embedded JSON (RU proxy)
 
 ```bash
-PROXY="http://user:pass@host:port" CIAN_PATH="snyat-kvartiru-posutochno" python cian/cian_parser.py
+parser-toolkit cian --proxy "http://user:pass@host:port" --path snyat-kvartiru-posutochno --pages 3
 ```
 
 ### Krisha.kz — Direct HTTP (KZ real estate)
 
 ```bash
 # metadata only (+ phone_preview like "+7 778")
-python krisha/krisha_parser.py --deal arenda --type kvartiry --city almaty --pages 2
+parser-toolkit krisha --deal arenda --type kvartiry --city almaty --pages 2
 
 # metadata + FULL phones (logged-in Krisha session cookie required)
 # DevTools → open any /a/show/… → Network → document request → copy Cookie header
 # Need krssid + kumd (not Google Ads cookies)
 KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
-  python krisha/krisha_parser.py --deal prodazha --type kvartiry --city astana --pages 1 --max 30
+  parser-toolkit krisha --deal prodazha --type kvartiry --city astana --pages 1 --max 30
 ```
 
 > **Note:** the site UI shows «Показать телефон», but with a logged-in session the
@@ -84,12 +102,9 @@ KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
 ### Kolesa.kz — autos (HTTP + Playwright phones)
 
 ```bash
-pip install playwright
-playwright install chromium
-
-# phones are ON by default (Playwright clicks «Показать телефон»)
+# phones are ON by default (Playwright + reCAPTCHA v3 in a real browser)
 KOLESA_COOKIE="klssid=…; kumd=…; …" \
-  python kolesa/kolesa_parser.py --city almaty --pages 1 --max 15 --out output/kolesa
+  parser-toolkit kolesa --city almaty --pages 1 --max 15 --out output/kolesa
 ```
 
 Phones API: `GET app.kolesa.kz/adverts/{id}/phones?captchaTokenV3=…&source=advert`  
@@ -102,6 +117,14 @@ output/twogis_places.json
 output/yandex_maps_places.json
 output/krisha_listings.json
 output/kolesa_listings.json
+```
+
+CLI help:
+
+```bash
+parser-toolkit --help
+parser-toolkit 2gis --help
+parser-toolkit --version
 ```
 
 ---
@@ -208,6 +231,8 @@ python -m unittest discover -s tests -v
 
 Tests use local fixtures only — they do **not** hit live sites.
 
+Errors from the CLI go to **stderr** with a non-zero exit code (`1` runtime, `2` bad args / missing deps, `130` interrupt). Unknown source names are rejected before any network call.
+
 ---
 
 ## ⚠️ Notes & disclaimer
@@ -223,6 +248,8 @@ Tests use local fixtures only — they do **not** hit live sites.
 
 [MIT](LICENSE)
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes (`v0.1.0`).
+
 ---
 
-Made by [@Rauan228](https://github.com/Rauan228). PRs and new source parsers welcome.
+Made by [@Rauan228](https://github.com/Rauan228). PRs welcome — new platforms later; v0.1 focuses on the five above.

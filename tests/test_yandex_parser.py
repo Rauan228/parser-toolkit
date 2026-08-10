@@ -3,17 +3,15 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "yandex-maps"))
 
-import yandex_maps_parser as ym  # noqa: E402
-from core.models import normalize_phone  # noqa: E402
+from parser_toolkit.core.models import normalize_phone  # noqa: E402
+from parser_toolkit.parsers import yandex_maps as ym  # noqa: E402
 
 FIXTURE = ROOT / "tests" / "fixtures" / "yandex_item.json"
 

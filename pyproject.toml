@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parser-toolkit"
+version = "0.1.0"
+description = "Local Direct HTTP parsers for popular CIS/RU platforms (2GIS, Yandex Maps, CIAN, Krisha, Kolesa)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+authors = [{ name = "Rauan Akhmetov" }]
+keywords = [
+  "scraping",
+  "parser",
+  "2gis",
+  "yandex-maps",
+  "cian",
+  "krisha",
+  "kolesa",
+  "cis",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = []
+
+[project.optional-dependencies]
+kolesa = ["playwright>=1.40.0"]
+all = ["playwright>=1.40.0"]
+dev = ["playwright>=1.40.0"]
+
+[project.urls]
+Homepage = "https://github.com/Rauan228/parser-toolkit"
+Repository = "https://github.com/Rauan228/parser-toolkit"
+Issues = "https://github.com/Rauan228/parser-toolkit/issues"
+
+[project.scripts]
+parser-toolkit = "parser_toolkit.cli:main"
+ptk = "parser_toolkit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["parser_toolkit*"]
+
+[tool.setuptools.package-data]
+parser_toolkit = ["py.typed"]

@@ -1,6 +1,6 @@
 # 🧰 parser-toolkit
 
-> Ready-to-run parsers for three big CIS/RU platforms — **2GIS**, **Yandex Maps** and **CIAN**. Pull listings and business data **with open public phone numbers** into clean CSV + JSON. You decide what to collect.
+> Ready-to-run parsers for popular CIS/RU platforms — **2GIS**, **Yandex Maps** and **CIAN**. Pull listings and business data **with open public phone numbers** into clean CSV + JSON. You decide what to collect.
 
 [Русская версия →](README.ru.md)
 
@@ -12,16 +12,17 @@ Each parser targets a source where contact phones are **publicly available** (no
 
 ## 📦 What's inside
 
-| Parser | Source | Collects | Method | Proxy | API key |
+| Parser | Source | Collects | Method | Proxy | User API key |
 |---|---|---|---|---|---|
-| [`2gis/`](2gis/) | [2GIS](https://2gis.ru) | any business category | Direct HTTP / Internal Catalog Web API | optional | — (site web key) |
-| [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Direct HTTP / Embedded JSON (search HTML) | optional | — |
-| [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP / Embedded JSON | 🇷🇺 RU proxy required | — |
+| [`2gis/`](2gis/) | [2GIS](https://2gis.ru) | any business category | Direct HTTP / Internal Catalog Web API | optional | Not required |
+| [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Direct HTTP / Embedded JSON (search HTML) | optional | Not required |
+| [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP / Embedded JSON | 🇷🇺 RU proxy required | Not required |
 
 Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/JSON writers).
 
 - **2GIS / Yandex Maps** — business directories: any query + list of cities.
 - **CIAN** — real estate: any section via `CIAN_PATH`.
+- **2GIS** uses the web key exposed by the 2GIS frontend; no user-provided API key is required.
 
 ---
 
@@ -100,8 +101,8 @@ CSV is UTF-8 with BOM for Excel.
 
 | Source | Need |
 |---|---|
-| 2GIS | nothing (uses the public web key embedded in 2gis.ru frontend) |
-| Yandex Maps | nothing (optional proxy if your IP is rate-limited) |
+| 2GIS | no user API key (uses the web key exposed by the 2GIS frontend) |
+| Yandex Maps | no user API key (optional proxy if your IP is rate-limited) |
 | CIAN | Russian residential/mobile proxy |
 
 ---

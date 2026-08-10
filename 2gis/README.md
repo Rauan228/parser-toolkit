@@ -4,8 +4,8 @@ Collects organizations of **any category** from 2GIS with their **open public
 phones** via **Direct HTTP** to the same **Internal Catalog Web API** that
 [2gis.ru](https://2gis.ru) uses (`catalog.api.2gis.ru`).
 
-**No Apify. No personal 2GIS API key.** Uses the public `webApiOutsourceKey`
-embedded in the 2GIS Online frontend (auto-refreshed if it rotates).
+**No Apify. No user-provided API key.** Uses the web key exposed by the 2GIS
+frontend (`webApiOutsourceKey`; auto-refreshed if it rotates).
 
 ## Run
 
@@ -43,5 +43,5 @@ JSON may include `phones[]`, `place_id`, and `raw`.
 
 ## Notes
 
-- This is an **internal web API** used by the site, not a separately provisioned developer key product — treat it as unofficial and rate-limit yourself.
+- A protocol-level web key exists (the one the site itself sends); **you do not register or paste a user API key**. Treat the endpoint as unofficial and rate-limit yourself.
 - Respect 2GIS Terms of Service and local law.

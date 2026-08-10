@@ -1,0 +1,2194 @@
+{
+ "advert": {
+  "id": 1014404142,
+  "storage": "live",
+  "commentsType": "adv",
+  "isOnMap": true,
+  "hasPrice": true,
+  "price": 300000,
+  "photos": [
+   {
+    "src": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/1-full.jpg",
+    "w": 1200,
+    "h": 900,
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ — фото 2",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н — фото 2"
+   },
+   {
+    "src": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/5-full.jpg",
+    "w": 1200,
+    "h": 675,
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ — фото 6",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н — фото 6"
+   },
+   {
+    "src": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/2-full.jpg",
+    "w": 506,
+    "h": 900,
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ — фото 3",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н — фото 3"
+   },
+   {
+    "src": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/4-full.jpg",
+    "w": 675,
+    "h": 900,
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ — фото 5",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н — фото 5"
+   },
+   {
+    "src": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/3-full.jpg",
+    "w": 675,
+    "h": 900,
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ — фото 4",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н — фото 4"
+   }
+  ],
+  "hasPackages": false,
+  "title": "1-комнатная квартира · 30 м² · 10/14 этаж",
+  "addressTitle": "Утепова 31",
+  "userType": "company",
+  "square": 30,
+  "rooms": 1,
+  "ownerName": " Atmosphere ",
+  "status": "live",
+  "complexId": 11653762,
+  "map": {
+   "lat": 43.219942596715,
+   "lon": 76.88718144707,
+   "zoom": 14,
+   "type": "yandex#map"
+  },
+  "sectionAlias": "arenda",
+  "categoryId": 2,
+  "categoryAlias": "kvartiry",
+  "address": {
+   "district": "Bostandykskiy_r-n",
+   "country": "Kazahstan",
+   "city": "Almaty",
+   "street": "Utepova",
+   "house_num": "31"
+  },
+  "isEstateVerified": false,
+  "isOwnedByCurrentUser": false,
+  "hasRelatedCompilation": false,
+  "isBookingEnabled": false
+ },
+ "adverts": [
+  {
+   "id": 1014404142,
+   "tempId": 1014404142,
+   "storage": "live",
+   "uuid": "1ba26e16-f981-48b5-b7a7-b27ff7b50e30",
+   "url": "//krisha.kz/a/show/1014404142",
+   "title": "1-комнатная квартира · 30 м² · 10/14 этаж",
+   "titleWithPrice": "1-комнатная квартира · 30 м² · 10/14 этаж за 300&nbsp;000&nbsp;<span class=\"currency-sign offer__currency\">₸</span>",
+   "city": "Алматы",
+   "address": "Утепова 31",
+   "fullAddress": "Алматы, Бостандыкский р-н, Утепова 31",
+   "price": "300&nbsp;000&nbsp;<span class=\"currency-sign offer__currency\">₸</span>",
+   "priceM2": 10000,
+   "priceM2Text": "за месяц",
+   "daysInLive": 10,
+   "description": "жил. комплекс RAMS City, меблирована полностью, Сдаётся уютная 1-комнатная квартира в ЖК RAMS City. Квартира светлая, чистая и полностью готова к заселению. Удобная планировка: просторная жилая комната, отдельная кухня, вместительная гардеробная зона и совмещённый санузел с ванной. Есть необход…",
+   "isFlatLayout": false,
+   "isHouseLayout": false,
+   "isLayout": false,
+   "category": {
+    "id": 2,
+    "name": "rent.flat",
+    "label": "Аренда квартир",
+    "isDisabled": false
+   },
+   "owner": {
+    "isPro": true,
+    "isComplex": false,
+    "isBuilder": false,
+    "isOwner": false,
+    "title": " Atmosphere ",
+    "label": {
+     "title": "Компания",
+     "name": "identified-company",
+     "color": "transparent"
+    },
+    "isChecked": false,
+    "isCurrentUser": false
+   },
+   "nbPhotos": 5,
+   "photo": {
+    "title": "Аренда квартир в Алматы: 1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸",
+    "alt": "1-комнатная квартира · 30 м² · 10/14 этаж, Утепова 31 за 300 000 ₸ в Алматы, Бостандыкский р-н",
+    "1x": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/1-280x175.jpg",
+    "1.5x": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/1-448x280.jpg",
+    "2x": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/1-560x350.jpg",
+    "3x": "https://krisha-photos.kcdn.online/webp/1b/1ba26e16-f981-48b5-b7a7-b27ff7b50e30/1-750x470.jpg",
+    "mainId": 1,
+    "isModerated": true,
+    "count": 5
+   },
+   "expiresAtText": "Будет перенесено в архив через <b>7&nbsp;дней</b>",
+   "deletedAtText": "Будет удалено 10 августа 2028 г.",
+   "expiresWarning": "Это объявление будет перенесено в архив через <b>7 дней</b>. Чтобы этого не случилось, продлите его.",
+   "isExpiresSoon": false,
+   "isEstateVerified": false,
+   "hiddenReason": {
+    "reason": "",
+    "comment": ""
+   },
+   "isEdited": false,
+   "isBookingEnabled": false,
+   "isEditable": false,
+   "isRemovable": false,
+   "isOwner": false,
+   "addedAt": "2026-08-10",
+   "createdAt": "2026-07-30",
+   "hasAutoRe": false,
+   "hasAutoUp": false,
+   "hasPackages": false,
+   "services": [
+    {
+     "name": "hot"
+    }
+   ],
+   "contactsInfo": {
+    "phonePreview": "+7 778 ",
+    "phonesNb": 1
+   },
+   "isAgent": false,
+   "statusBadge": {
+    "text": "Рекламируется до завтра",
+    "textColor": "#FFFFFF",
+    "backgroundColor": "#64BD38"
+   },
+   "hasActiveBookingRequests": false,
+   "hasPhoto": true,
+   "paidServices": {
+    "auto-re": {
+     "name": "auto-re",
+     "apiName": "auto-re",
+     "successMessage": "Будет автоматически продлеваться каждые 7 дней",
+     "cancelMessage": "Не будет автоматически продлеваться",
+     "cancelTitle": null,
+     "price": 0,
+     "title": "Автопродление",
+     "description": "Автоматически продлевать это объявление каждую неделю.",
+     "isCancelable": true,
+     "icon": "re",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Автопродление за 870 ₸/нед.",
+     "additionalButtonText": "Автоматически продлевать это объявление каждую неделю.",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "auto-up": {
+     "name": "auto-up",
+     "apiName": "auto-up",
+     "successMessage": "Будет автоматически подниматься в ТОП раз в сутки",
+     "cancelMessage": "Не будет автоматически подниматься в ТОП",
+     "cancelTitle": null,
+     "price": 0,
+     "title": "Автоподнятие",
+     "description": "Объявление будет поднято выше бесплатных на 24 часа, каждый день.",
+     "isCancelable": true,
+     "icon": "up",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Поднимать в ТОП за 1150 ₸ в день",
+     "additionalButtonText": "Объявление будет поднято выше бесплатных на 24 часа, каждый день.",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "archive-re": {
+     "name": "archive-re",
+     "apiName": "re",
+     "successMessage": "Объявление восстановлено",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 870,
+     "title": "Восстановить",
+     "description": "Ваше объявление проживет на сайте 7 дней с момента восстановления.",
+     "isCancelable": false,
+     "icon": "re",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Восстановить за 870 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": ""
+    },
+    "hot": {
+     "name": "hot",
+     "apiName": "hot",
+     "successMessage": "Помещено в Горячие",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 885,
+     "title": "Отправить в Горячие",
+     "description": "Объявление попадёт в горячие предложения. Каждый посетитель сайта или приложения видит объявление в 4 раза чаще.",
+     "isCancelable": false,
+     "icon": "hot",
+     "quantity": 1,
+     "isApplied": true,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Отправить в Горячие за 885 ₸",
+     "additionalButtonText": "24 часа в Горячих предложениях",
+     "unavailableMessage": "<a href=\"/my/?returnUrl=https%3A%2F%2Fkrisha.kz%2Fmy%2Fphotos%3Fid%3D1014404142\" class=\"menu-item-photo\">Добавьте фото</a> в объявление, чтобы разместить в горячих."
+    },
+    "plus-b2b-one": {
+     "name": "plus-b2b-one",
+     "apiName": "plus-b2b-one",
+     "successMessage": "Подписка успешно подключена",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 3572,
+     "title": "Подписка на месяц",
+     "description": "Подписка Krisha PLUS",
+     "isCancelable": false,
+     "icon": "",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Подписка на месяц",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "plus-b2c-one": {
+     "name": "plus-b2c-one",
+     "apiName": "plus-b2c-one",
+     "successMessage": "paidServices.plus-b2c-one.successMessage",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 2852,
+     "title": "Подписка на месяц",
+     "description": "Подписка Krisha PLUS",
+     "isCancelable": false,
+     "icon": "",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Подписка на месяц",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "limit-pay": {
+     "name": "limit-pay",
+     "apiName": "limit-pay",
+     "successMessage": "Объявление успешно оплачено и отправлено модератору.",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 45,
+     "title": "Опубликовать",
+     "description": "Объявление будет опубликовано на сайте после оплаты и проверки модератором.",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": true,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Опубликовать за 45 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "re": {
+     "name": "re",
+     "apiName": "re",
+     "successMessage": "Продлено на 7 дней",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 870,
+     "title": "Продлить",
+     "description": "Объявление будет на сайте 7 дней с момента продления.",
+     "isCancelable": false,
+     "icon": "re",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Продлить на неделю за 870 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Вы недавно продлевали это объявление. Бесплатное продление доступно раз в сутки."
+    },
+    "up": {
+     "name": "up",
+     "apiName": "up",
+     "successMessage": "Отправлено в ТОП",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1150,
+     "title": "Отправить в ТОП",
+     "description": "Объявление поднято в поиске выше бесплатных на 24 часа.",
+     "isCancelable": false,
+     "icon": "up",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Отправить в ТОП за 1150 ₸",
+     "additionalButtonText": "24 часа выше бесплатных объявлений",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "up-gold": {
+     "name": "up-gold",
+     "apiName": "up-gold",
+     "successMessage": "Отправлено в ТОП",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1495,
+     "title": "Отправить в ТОП",
+     "description": "Объявление поднято в поиске выше бесплатных на 24 часа.",
+     "isCancelable": false,
+     "icon": "up",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Отправить в ТОП за 1495 ₸",
+     "additionalButtonText": "24 часа выше бесплатных объявлений",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "up-premium": {
+     "name": "up-premium",
+     "apiName": "up-premium",
+     "successMessage": "Отправлено в ТОП",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1725,
+     "title": "Отправить в ТОП",
+     "description": "Объявление поднято в поиске выше бесплатных на 24 часа.",
+     "isCancelable": false,
+     "icon": "up",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Отправить в ТОП за 1725 ₸",
+     "additionalButtonText": "24 часа выше бесплатных объявлений",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "s": {
+     "name": "s",
+     "apiName": "s",
+     "successMessage": "Помечено флажком «Срочно, торг»",
+     "cancelMessage": "Снят флажок «Срочно, торг»",
+     "cancelTitle": "Убрать «Срочно, торг»",
+     "price": 90,
+     "title": "Срочно, торг",
+     "description": "Такая метка вызывает на 60% больше интереса у покупателей.",
+     "isCancelable": true,
+     "icon": "urgent",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Поставить «Срочно, торг» за 90 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "paid-auto-re": {
+     "name": "paid-auto-re",
+     "apiName": "paid-auto-re",
+     "successMessage": "paidServices.paid-auto-re.successMessage",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 870,
+     "title": "Продлить",
+     "description": "Автоматически продлевать это объявление.",
+     "isCancelable": false,
+     "icon": "re",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Продлить на неделю за 870 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Вы недавно продлевали это объявление. Бесплатное продление доступно раз в сутки."
+    },
+    "pack-5-limit": {
+     "name": "pack-5-limit",
+     "apiName": "pack-5-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 200,
+     "title": "5 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "5 объявлений по 40 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "5"
+    },
+    "pack-15-limit": {
+     "name": "pack-15-limit",
+     "apiName": "pack-15-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 570,
+     "title": "15 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "15 объявлений по 38 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "15"
+    },
+    "pack-25-limit": {
+     "name": "pack-25-limit",
+     "apiName": "pack-25-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 825,
+     "title": "25 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "25 объявлений по 33 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "25"
+    },
+    "pack-35-limit": {
+     "name": "pack-35-limit",
+     "apiName": "pack-35-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1015,
+     "title": "35 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "35 объявлений по 29 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "35"
+    },
+    "pack-55-limit": {
+     "name": "pack-55-limit",
+     "apiName": "pack-55-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1320,
+     "title": "55 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "55 объявлений по 24 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "55"
+    },
+    "pack-100-limit": {
+     "name": "pack-100-limit",
+     "apiName": "pack-100-limit",
+     "successMessage": "Куплен пакет размещений",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1900,
+     "title": "100 объявлений сверх лимита",
+     "description": "Действует 7 дней",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "100 объявлений по 19 ₸",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "shortButtonText": "100"
+    },
+    "saved-search": {
+     "name": "saved-search",
+     "apiName": "saved-search",
+     "successMessage": "paidServices.saved-search.successMessage",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 950,
+     "title": "Подписка на поиск",
+     "description": "paidServices.saved-search.description",
+     "isCancelable": false,
+     "icon": "",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Подписка на поиск",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "map-mark": {
+     "name": "map-mark",
+     "apiName": "map-mark",
+     "successMessage": "Продвижение на карте включено",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 1200,
+     "title": "Продвигать на карте",
+     "description": "Фото и яркий значок сделают объявление заметным на карте. Действует 7 дней",
+     "isCancelable": false,
+     "icon": "",
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": false,
+     "isVisibleInCabinet": false,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Продвигать на карте за 1200 ₸",
+     "additionalButtonText": "7 дней ярче всех",
+     "unavailableMessage": "Услуга недоступна для этого объявления."
+    },
+    "hot-day": {
+     "name": "hot-day",
+     "apiName": "hot-day",
+     "successMessage": "Подключен пакет в Горячие на сутки",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 5664,
+     "title": "Акция в Горячие на сутки",
+     "description": "Каждые 2 часа на главной странице, 8 раз в Горячих предложениях, Период включения с 8:00 до 23:45, Действует сутки с момента покупки",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Отправить 8 раз в Горячие",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "defaultPrice": 7080,
+     "savingText": "Экономия 1&nbsp;416&nbsp;<span class=\"currency-sign offer__currency\">₸</span>",
+     "discount": {
+      "percent": 20,
+      "value": 5664
+     },
+     "descriptionList": [
+      "Каждые 2 часа на главной странице",
+      "8 раз в Горячих предложениях",
+      "Период включения с 8:00 до 23:45",
+      "Действует сутки с момента покупки"
+     ],
+     "shortButtonText": "8 раз в Горячие за 5664 ₸",
+     "dayPrice": 5664,
+     "labels": []
+    },
+    "month-sale": {
+     "name": "month-sale",
+     "apiName": "month-sale",
+     "successMessage": "Подключен пакет ×15 просмотров",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 14990,
+     "title": "×15 просмотров на месяц",
+     "description": "28 дней активного продвижения, Каждый день поднятие в ТОП, 12 раз в Горячих",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Продвинуть",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "defaultPrice": 46580,
+     "savingText": "Экономия 31&nbsp;590&nbsp;<span class=\"currency-sign offer__currency\">₸</span>",
+     "discount": {
+      "percent": 67,
+      "value": 14990
+     },
+     "descriptionList": [
+      "28 дней активного продвижения",
+      "Каждый день поднятие в ТОП",
+      "12 раз в Горячих"
+     ],
+     "shortButtonText": "Продвигать за 536 ₸ в день",
+     "dayPrice": 536,
+     "labels": []
+    },
+    "week-sale": {
+     "name": "week-sale",
+     "apiName": "week-sale",
+     "successMessage": "Подключен пакет ×5 просмотров",
+     "cancelMessage": null,
+     "cancelTitle": null,
+     "price": 7705,
+     "title": "×5 просмотров на неделю",
+     "description": "7 дней активного продвижения, Каждый день поднятие в ТОП, Каждый день в Горячих",
+     "isCancelable": false,
+     "icon": null,
+     "quantity": 1,
+     "isApplied": false,
+     "isAvailable": true,
+     "isVisibleInCabinet": true,
+     "advertId": 1014404142,
+     "advertStorage": "live",
+     "freeLockTime": "меньше часа",
+     "freeLockTimeSec": 0,
+     "buttonText": "Продвинуть",
+     "additionalButtonText": "",
+     "unavailableMessage": "Услуга недоступна для этого объявления.",
+     "defaultPrice": 14245,
+     "savingText": "Экономия 6&nbsp;540&nbsp;<span class=\"currency-sign offer__currency\">₸</span>",
+     "discount": {
+      "percent": 45,
+      "value": 7705
+     },
+     "descriptionList": [
+      "7 дней активного продвижения",
+      "Каждый день поднятие в ТОП",
+      "Каждый день в Горячих"
+     ],
+     "shortButtonText": "Продвигать за 1101 ₸ в день",
+     "dayPrice": 1101,
+     "labels": []
+    }
+   },
+   "phones": [
+    "+7 778 046 4438"
+   ]
+  }
+ ],
+ "analysisUrl": "/analytics/aPriceAnalysis/",
+ "platform": "desktop",
+ "utm": "",
+ "phonesUrl": "/a/ajaxPhones?id=1014404142",
+ "claims": {
+  "getReasonsUrl": "/claim/ajaxGetReasons/"
+ },
+ "agent": {
+  "landingUrl": "https://krisha.kz/agents/buy?from=advert&geoId=73",
+  "getReasonsUrl": "/agent/ajaxGetReasons/"
+ },
+ "creditIsEnabled": false,
+ "creditInfo": null,
+ "user": {
+  "phones": {
+   "main": null
+  },
+  "accountFill": null,
+  "balanceAmount": 0,
+  "email": null,
+  "globalId": null,
+  "hasActiveSubscription": false,
+  "id": null,
+  "identificationInfo": null,
+  "isAgent": false,
+  "isBuilder": false,
+  "isBuilderOrComplex": false,
+  "isCompany": false,
+  "isComplex": false,
+  "isGuest": true,
+  "isIdentified": false,
+  "isOwner": false,
+  "isPro": false,
+  "isSpecialist": false,
+  "isStatusVerified": false,
+  "locale": "ru",
+  "logoImg": null,
+  "name": null,
+  "type": null,
+  "typeAlias": null,
+  "xdmAssetUrl": "https://id.kolesa.kz/authToken.js"
+ },
+ "settings": {
+  "showTextTranslation": true
+ },
+ "searchAnalytics": null,
+ "dGisRegions": [
+  {
+   "name": "Усть-Каменогорск",
+   "bounds": [
+    [
+     49.798516,
+     82.661138
+    ],
+    [
+     49.841691,
+     82.545707
+    ],
+    [
+     49.846928,
+     82.44862
+    ],
+    [
+     49.92013,
+     82.392522
+    ],
+    [
+     49.961702,
+     82.454
+    ],
+    [
+     50.045936,
+     82.43318
+    ],
+    [
+     50.059192,
+     82.450724
+    ],
+    [
+     50.057306,
+     82.715976
+    ],
+    [
+     50.028657,
+     82.806336
+    ],
+    [
+     50.00252,
+     82.796278
+    ],
+    [
+     49.864261,
+     82.911019
+    ],
+    [
+     49.819293,
+     82.904611
+    ],
+    [
+     49.801722,
+     82.95274
+    ],
+    [
+     49.761077,
+     82.980783
+    ],
+    [
+     49.762443,
+     82.834545
+    ],
+    [
+     49.798516,
+     82.661138
+    ]
+   ]
+  },
+  {
+   "name": "Костанай",
+   "bounds": [
+    [
+     53.081786,
+     63.570864
+    ],
+    [
+     53.060798,
+     63.541088
+    ],
+    [
+     53.101271,
+     63.459462
+    ],
+    [
+     53.125499,
+     63.510712
+    ],
+    [
+     53.201547,
+     63.455974
+    ],
+    [
+     53.216818,
+     63.485376
+    ],
+    [
+     53.256371,
+     63.484464
+    ],
+    [
+     53.31686,
+     63.624834
+    ],
+    [
+     53.291543,
+     63.646629
+    ],
+    [
+     53.288387,
+     63.746165
+    ],
+    [
+     53.161294,
+     63.629891
+    ],
+    [
+     53.157604,
+     63.673836
+    ],
+    [
+     53.081786,
+     63.570864
+    ]
+   ]
+  },
+  {
+   "name": "Атырау",
+   "bounds": [
+    [
+     47.15804,
+     51.81079
+    ],
+    [
+     47.185327,
+     51.773854
+    ],
+    [
+     47.206253,
+     51.783515
+    ],
+    [
+     47.218498,
+     51.838706
+    ],
+    [
+     47.208672,
+     51.861149
+    ],
+    [
+     47.175483,
+     51.876595
+    ],
+    [
+     47.184051,
+     51.983982
+    ],
+    [
+     47.159303,
+     52.057235
+    ],
+    [
+     47.149367,
+     52.067301
+    ],
+    [
+     47.140455,
+     52.044594
+    ],
+    [
+     47.121763,
+     52.046404
+    ],
+    [
+     47.095943,
+     52.091744
+    ],
+    [
+     47.045744,
+     51.972771
+    ],
+    [
+     47.054367,
+     51.928291
+    ],
+    [
+     47.009789,
+     51.917185
+    ],
+    [
+     47.012164,
+     51.882894
+    ],
+    [
+     47.039007,
+     51.873782
+    ],
+    [
+     47.008341,
+     51.837904
+    ],
+    [
+     47.013373,
+     51.823097
+    ],
+    [
+     47.05764,
+     51.852235
+    ],
+    [
+     47.049269,
+     51.819873
+    ],
+    [
+     47.104107,
+     51.780297
+    ],
+    [
+     47.15804,
+     51.81079
+    ]
+   ]
+  },
+  {
+   "name": "Актобе",
+   "bounds": [
+    [
+     50.565431,
+     57.131233
+    ],
+    [
+     50.584455,
+     57.29241
+    ],
+    [
+     50.522876,
+     57.319324
+    ],
+    [
+     50.507563,
+     57.456565
+    ],
+    [
+     50.537321,
+     57.508771
+    ],
+    [
+     50.489218,
+     57.653998
+    ],
+    [
+     50.502943,
+     57.702377
+    ],
+    [
+     50.488773,
+     57.760821
+    ],
+    [
+     50.410886,
+     57.770117
+    ],
+    [
+     50.374648,
+     57.71458
+    ],
+    [
+     50.353087,
+     57.76243
+    ],
+    [
+     50.330205,
+     57.773313
+    ],
+    [
+     50.275572,
+     57.744175
+    ],
+    [
+     50.257032,
+     57.755202
+    ],
+    [
+     50.241394,
+     57.669871
+    ],
+    [
+     50.19675,
+     57.687866
+    ],
+    [
+     50.188895,
+     57.573892
+    ],
+    [
+     50.169447,
+     57.558014
+    ],
+    [
+     50.121144,
+     57.425888
+    ],
+    [
+     50.120826,
+     57.148367
+    ],
+    [
+     50.152601,
+     56.977926
+    ],
+    [
+     50.21554,
+     56.914478
+    ],
+    [
+     50.275119,
+     56.94188
+    ],
+    [
+     50.313889,
+     56.88205
+    ],
+    [
+     50.343913,
+     56.862849
+    ],
+    [
+     50.3877,
+     56.861403
+    ],
+    [
+     50.556581,
+     57.073194
+    ],
+    [
+     50.565431,
+     57.131233
+    ]
+   ]
+  },
+  {
+   "name": "Актау",
+   "bounds": [
+    [
+     43.559453,
+     50.989242
+    ],
+    [
+     43.960347,
+     50.700278
+    ],
+    [
+     44.143806,
+     50.548767
+    ],
+    [
+     44.173939,
+     50.310331
+    ],
+    [
+     44.240731,
+     50.159119
+    ],
+    [
+     44.316906,
+     50.077464
+    ],
+    [
+     44.386403,
+     50.050169
+    ],
+    [
+     44.549467,
+     50.033572
+    ],
+    [
+     44.758753,
+     49.924839
+    ],
+    [
+     44.834275,
+     49.858647
+    ],
+    [
+     44.920822,
+     49.815392
+    ],
+    [
+     45.023361,
+     49.816353
+    ],
+    [
+     45.094706,
+     49.847194
+    ],
+    [
+     45.134367,
+     49.8831
+    ],
+    [
+     45.186872,
+     50.017069
+    ],
+    [
+     45.198264,
+     50.314389
+    ],
+    [
+     45.185556,
+     50.4106
+    ],
+    [
+     45.080803,
+     50.707747
+    ],
+    [
+     45.115622,
+     50.871631
+    ],
+    [
+     45.264022,
+     51.078633
+    ],
+    [
+     45.462642,
+     51.269189
+    ],
+    [
+     45.507019,
+     51.342392
+    ],
+    [
+     45.592703,
+     51.730008
+    ],
+    [
+     45.534531,
+     52.155669
+    ],
+    [
+     45.552439,
+     52.290372
+    ],
+    [
+     45.607825,
+     52.471922
+    ],
+    [
+     45.719714,
+     52.541508
+    ],
+    [
+     46.091373,
+     53.021861
+    ],
+    [
+     46.012055,
+     53.191789
+    ],
+    [
+     46.0156,
+     53.684004
+    ],
+    [
+     46.127348,
+     53.895303
+    ],
+    [
+     46.192437,
+     53.968557
+    ],
+    [
+     46.24613,
+     53.971735
+    ],
+    [
+     46.257033,
+     54.30769
+    ],
+    [
+     46.30105,
+     54.504746
+    ],
+    [
+     46.323051,
+     54.692764
+    ],
+    [
+     46.363543,
+     54.832578
+    ],
+    [
+     46.379528,
+     55.089586
+    ],
+    [
+     46.367362,
+     55.270475
+    ],
+    [
+     46.520131,
+     55.487919
+    ],
+    [
+     46.421094,
+     55.602653
+    ],
+    [
+     46.419648,
+     55.657382
+    ],
+    [
+     46.399684,
+     55.698046
+    ],
+    [
+     46.401193,
+     55.81798
+    ],
+    [
+     46.349698,
+     55.824929
+    ],
+    [
+     46.305272,
+     55.860157
+    ],
+    [
+     46.276012,
+     55.820425
+    ],
+    [
+     46.251191,
+     55.837026
+    ],
+    [
+     46.237314,
+     55.90249
+    ],
+    [
+     46.260008,
+     55.95692
+    ],
+    [
+     46.210459,
+     55.981457
+    ],
+    [
+     46.211476,
+     56.04476
+    ],
+    [
+     46.154545,
+     56.121737
+    ],
+    [
+     46.135755,
+     56.201516
+    ],
+    [
+     46.151583,
+     56.286168
+    ],
+    [
+     46.132189,
+     56.46663
+    ],
+    [
+     46.097356,
+     56.516505
+    ],
+    [
+     46.005868,
+     56.552526
+    ],
+    [
+     45.926133,
+     56.605778
+    ],
+    [
+     45.177249,
+     56.744109
+    ],
+    [
+     45.000314,
+     55.998743
+    ],
+    [
+     41.324124,
+     56.001508
+    ],
+    [
+     41.331786,
+     55.876714
+    ],
+    [
+     41.297155,
+     55.816356
+    ],
+    [
+     41.278338,
+     55.811717
+    ],
+    [
+     41.302058,
+     55.743336
+    ],
+    [
+     41.293192,
+     55.721496
+    ],
+    [
+     41.279493,
+     55.727086
+    ],
+    [
+     41.282813,
+     55.63561
+    ],
+    [
+     41.246392,
+     55.603316
+    ],
+    [
+     41.272913,
+     55.600034
+    ],
+    [
+     41.27195,
+     55.576874
+    ],
+    [
+     41.294407,
+     55.567019
+    ],
+    [
+     41.287966,
+     55.545235
+    ],
+    [
+     41.27561,
+     55.557026
+    ],
+    [
+     41.259293,
+     55.542728
+    ],
+    [
+     41.251587,
+     55.499612
+    ],
+    [
+     41.269299,
+     55.450623
+    ],
+    [
+     41.293651,
+     55.442191
+    ],
+    [
+     41.279495,
+     55.430472
+    ],
+    [
+     41.337222,
+     55.398313
+    ],
+    [
+     41.390882,
+     55.315465
+    ],
+    [
+     41.604653,
+     55.119606
+    ],
+    [
+     41.699339,
+     55.066234
+    ],
+    [
+     41.833213,
+     54.949976
+    ],
+    [
+     41.906308,
+     54.952115
+    ],
+    [
+     41.928325,
+     54.928925
+    ],
+    [
+     42.052549,
+     54.779482
+    ],
+    [
+     42.379087,
+     54.21781
+    ],
+    [
+     42.288924,
+     53.570558
+    ],
+    [
+     42.121175,
+     52.984788
+    ],
+    [
+     41.761967,
+     52.449984
+    ],
+    [
+     41.719338,
+     52.335076
+    ],
+    [
+     41.724447,
+     52.259144
+    ],
+    [
+     42.117106,
+     52.229019
+    ],
+    [
+     42.212153,
+     52.258633
+    ],
+    [
+     42.469697,
+     52.440644
+    ],
+    [
+     42.601758,
+     52.392847
+    ],
+    [
+     42.6508,
+     52.195397
+    ],
+    [
+     42.695872,
+     51.836542
+    ],
+    [
+     42.757403,
+     51.737094
+    ],
+    [
+     42.893483,
+     51.635567
+    ],
+    [
+     42.967481,
+     51.557783
+    ],
+    [
+     43.003889,
+     51.262286
+    ],
+    [
+     43.05145,
+     51.132642
+    ],
+    [
+     43.123231,
+     51.077578
+    ],
+    [
+     43.160703,
+     51.071017
+    ],
+    [
+     43.450783,
+     51.096811
+    ],
+    [
+     43.559453,
+     50.989242
+    ]
+   ]
+  },
+  {
+   "name": "Караганда",
+   "bounds": [
+    [
+     49.97048,
+     72.86687
+    ],
+    [
+     50.031985,
+     72.864145
+    ],
+    [
+     50.071579,
+     72.830379
+    ],
+    [
+     50.132364,
+     72.835457
+    ],
+    [
+     50.159294,
+     72.846029
+    ],
+    [
+     50.192972,
+     72.930852
+    ],
+    [
+     50.170885,
+     73.145574
+    ],
+    [
+     50.157115,
+     73.166584
+    ],
+    [
+     50.153223,
+     73.353485
+    ],
+    [
+     50.005306,
+     73.413468
+    ],
+    [
+     49.686854,
+     73.38921
+    ],
+    [
+     49.65147,
+     73.2999
+    ],
+    [
+     49.637712,
+     73.198415
+    ],
+    [
+     49.688026,
+     72.861947
+    ],
+    [
+     49.738372,
+     72.877067
+    ],
+    [
+     49.97048,
+     72.86687
+    ]
+   ]
+  },
+  {
+   "name": "Шымкент",
+   "bounds": [
+    [
+     42.43852,
+     69.416245
+    ],
+    [
+     42.436468,
+     69.802137
+    ],
+    [
+     42.242484,
+     69.799675
+    ],
+    [
+     42.244521,
+     69.414967
+    ],
+    [
+     42.43852,
+     69.416245
+    ]
+   ]
+  },
+  {
+   "name": "Алматы",
+   "bounds": [
+    [
+     43.311356,
+     76.721521
+    ],
+    [
+     43.366891,
+     76.698817
+    ],
+    [
+     43.442281,
+     76.69697
+    ],
+    [
+     43.495902,
+     76.773217
+    ],
+    [
+     43.478949,
+     76.887808
+    ],
+    [
+     43.491006,
+     76.919061
+    ],
+    [
+     43.461021,
+     76.964974
+    ],
+    [
+     43.475405,
+     77.024019
+    ],
+    [
+     43.468224,
+     77.071052
+    ],
+    [
+     43.420876,
+     77.111197
+    ],
+    [
+     43.384974,
+     77.092545
+    ],
+    [
+     43.350398,
+     77.121697
+    ],
+    [
+     43.288623,
+     77.130764
+    ],
+    [
+     43.243627,
+     77.160741
+    ],
+    [
+     43.073856,
+     77.107785
+    ],
+    [
+     43.070938,
+     77.089632
+    ],
+    [
+     43.034066,
+     77.077184
+    ],
+    [
+     43.049618,
+     76.966515
+    ],
+    [
+     43.033771,
+     76.943479
+    ],
+    [
+     43.037882,
+     76.906183
+    ],
+    [
+     43.083947,
+     76.900697
+    ],
+    [
+     43.103095,
+     76.741722
+    ],
+    [
+     43.167253,
+     76.70909
+    ],
+    [
+     43.311356,
+     76.721521
+    ]
+   ]
+  },
+  {
+   "name": "Кокшетау",
+   "bounds": [
+    [
+     53.276659,
+     69.004116
+    ],
+    [
+     53.318062,
+     68.997167
+    ],
+    [
+     53.327877,
+     69.167949
+    ],
+    [
+     53.39313,
+     69.161429
+    ],
+    [
+     53.383133,
+     69.274826
+    ],
+    [
+     53.397231,
+     69.277034
+    ],
+    [
+     53.404166,
+     69.315124
+    ],
+    [
+     53.370948,
+     69.327714
+    ],
+    [
+     53.365164,
+     69.426323
+    ],
+    [
+     53.377566,
+     69.615022
+    ],
+    [
+     53.305991,
+     69.762747
+    ],
+    [
+     53.20418,
+     69.867178
+    ],
+    [
+     53.155209,
+     70.039459
+    ],
+    [
+     53.165043,
+     70.24582
+    ],
+    [
+     53.153623,
+     70.368026
+    ],
+    [
+     53.116561,
+     70.404051
+    ],
+    [
+     52.928993,
+     70.478959
+    ],
+    [
+     52.871445,
+     70.201804
+    ],
+    [
+     52.895084,
+     70.179755
+    ],
+    [
+     52.904612,
+     70.141435
+    ],
+    [
+     52.819776,
+     69.911928
+    ],
+    [
+     52.812507,
+     69.682352
+    ],
+    [
+     52.828986,
+     69.557302
+    ],
+    [
+     52.938954,
+     69.320958
+    ],
+    [
+     52.881871,
+     69.146486
+    ],
+    [
+     52.910955,
+     69.012816
+    ],
+    [
+     53.140112,
+     69.147482
+    ],
+    [
+     53.224041,
+     69.27637
+    ],
+    [
+     53.225447,
+     69.012491
+    ],
+    [
+     53.276659,
+     69.004116
+    ]
+   ]
+  },
+  {
+   "name": "Астана",
+   "bounds": [
+    [
+     50.949137,
+     71.25763
+    ],
+    [
+     51.015405,
+     71.15911
+    ],
+    [
+     51.259035,
+     71.127413
+    ],
+    [
+     51.306666,
+     71.33122
+    ],
+    [
+     51.331666,
+     71.641526
+    ],
+    [
+     51.378815,
+     71.718671
+    ],
+    [
+     51.217734,
+     71.842987
+    ],
+    [
+     51.02963,
+     71.87991
+    ],
+    [
+     50.971068,
+     71.86563
+    ],
+    [
+     50.928205,
+     71.609524
+    ],
+    [
+     50.949137,
+     71.25763
+    ]
+   ]
+  },
+  {
+   "name": "Петропавловск",
+   "bounds": [
+    [
+     54.952036,
+     69.347885
+    ],
+    [
+     54.797665,
+     69.266608
+    ],
+    [
+     54.763737,
+     69.198513
+    ],
+    [
+     54.847098,
+     68.951741
+    ],
+    [
+     54.879526,
+     68.973207
+    ],
+    [
+     54.883477,
+     68.994401
+    ],
+    [
+     54.922347,
+     68.995059
+    ],
+    [
+     54.982374,
+     69.075263
+    ],
+    [
+     54.996193,
+     69.147545
+    ],
+    [
+     54.952036,
+     69.347885
+    ]
+   ]
+  },
+  {
+   "name": "Павлодар",
+   "bounds": [
+    [
+     52.214201,
+     77.223834
+    ],
+    [
+     52.014535,
+     77.241662
+    ],
+    [
+     51.991758,
+     76.992875
+    ],
+    [
+     51.989277,
+     76.9173
+    ],
+    [
+     52.020351,
+     76.769674
+    ],
+    [
+     52.166653,
+     76.660819
+    ],
+    [
+     52.180226,
+     76.600238
+    ],
+    [
+     52.229329,
+     76.645111
+    ],
+    [
+     52.439188,
+     76.675924
+    ],
+    [
+     52.479541,
+     76.992228
+    ],
+    [
+     52.446979,
+     77.235345
+    ],
+    [
+     52.214201,
+     77.223834
+    ]
+   ]
+  },
+  {
+   "name": "Уральск",
+   "bounds": [
+    [
+     51.248864,
+     51.568736
+    ],
+    [
+     51.225437,
+     51.580605
+    ],
+    [
+     51.155685,
+     51.56813
+    ],
+    [
+     51.03227,
+     51.241077
+    ],
+    [
+     51.048987,
+     51.217932
+    ],
+    [
+     51.217896,
+     51.272711
+    ],
+    [
+     51.243037,
+     51.258108
+    ],
+    [
+     51.293382,
+     51.265796
+    ],
+    [
+     51.295239,
+     51.323377
+    ],
+    [
+     51.31411,
+     51.353126
+    ],
+    [
+     51.281324,
+     51.446775
+    ],
+    [
+     51.289132,
+     51.535491
+    ],
+    [
+     51.248864,
+     51.568736
+    ]
+   ]
+  }
+ ],
+ "crime": {
+  "api": "https://krisha.kz/ms/geodata/crime",
+  "button": "Преступность",
+  "title": "Показатели преступности"
+ },
+ "svgIconsUrl": "//krisha.kz/static/frontend/svg/sprite-icons.b01a3de475e011a5f8d8.svg",
+ "app": "Frontend",
+ "baseHostname": "krisha.kz",
+ "mobileHostname": "m.krisha.kz",
+ "cookieDomain": ".krisha.kz",
+ "isRemoteResourcesEnabled": true,
+ "isDebug": false,
+ "isWebView": false,
+ "route": "a:show",
+ "controller": "a",
+ "action": "show",
+ "ab": [],
+ "isFavoritesEnabled": true,
+ "photoHost": "krisha-photos.kcdn.online",
+ "views": {
+  "host": "http://views:8080",
+  "location": "ms/views"
+ },
+ "centrifuge": {
+  "url": "wss://ws.krisha.kz/v2/connection/websocket"
+ },
+ "config": {
+  "isProduction": true,
+  "isDevelopment": false,
+  "isTesting": false,
+  "sentry": {
+   "isEnabled": true,
+   "blackList": "closest, window.Ya.adfoxCode, adFoxAdaptive, NS_ERROR_STORAGE_IOERR, enterprise"
+  },
+  "bucky": {
+   "host": "/ms/rum",
+   "aggregationInterval": 100,
+   "sample": 10
+  },
+  "photosCDN": {
+   "cookieName": "kr_cdn_host",
+   "defaultHost": "krisha-photos.kcdn.online"
+  },
+  "staticLink": "//krisha.kz/static/frontend",
+  "nps": {
+   "url": "https://krisha.kz/ms/nps/v2"
+  },
+  "yandexMaps": {
+   "apiKey": "8005a76b-66c7-44b3-8f94-355bbff74d27"
+  },
+  "eventStream": {
+   "hostsEndpoint": "https://app.krisha.kz/events.json",
+   "topic": "krisha-frontend-user-events-prod"
+  },
+  "spaMobileHost": "https://m.krisha.kz",
+  "region": {
+   "autocompleteUrl": "/region/ajaxAutocomplete",
+   "parentChainUrl": "/region/ajaxParentChain"
+  }
+ },
+ "ipInfo": {
+  "ip": "178.91.106.16",
+  "ipCity": "Astana",
+  "ipCountry": "KZ"
+ },
+ "appUrl": "https://app.krisha.kz",
+ "appToken": "JcqPEpqf%2FwuHIpClleBcn8aqdAEX6ojZ0lmJItdgv2smVFawTYIqqiKMjYr3qUYxI%2FqIgePQ8BNa1jjZIaGBLPg0unZMbb5fddAsni9T%2FYQ1%2F9IS0Prygi0PVHGOHn2i02MMc4X%2BsbneYhiKrtb0t0KlgDxksp8rHK2GFuOS0IdhibkvoLSlFIYcdPDVE%2FMgMZGJ%2BWFHthzKOLe2yz85f11TZCymOsNys7SS1BJHEtY%3D",
+ "appId": "456741756767",
+ "appKey": "69834ucv934t59543nhg4935g045gj8gj0"
+}

@@ -40,12 +40,15 @@ class HttpClient:
         proxy: str = "",
         user_agent: str = DEFAULT_UA,
         sleep_base: float = 0.6,
+        cookie: str = "",
     ) -> None:
         self.timeout = timeout
         self.retries = max(1, retries)
         self.proxy = (proxy or "").strip()
         self.user_agent = user_agent
         self.sleep_base = sleep_base
+        # Optional raw Cookie header (e.g. browser session for Krisha phones).
+        self.cookie = (cookie or "").strip()
         self.cookie_jar = http.cookiejar.CookieJar()
         self._ssl = ssl.create_default_context()
         self._opener = self._build_opener()
@@ -120,6 +123,8 @@ class HttpClient:
         }
         if referer:
             h["Referer"] = referer
+        if self.cookie:
+            h["Cookie"] = self.cookie
         if headers:
             h.update(dict(headers))
         req = urllib.request.Request(url, headers=h)

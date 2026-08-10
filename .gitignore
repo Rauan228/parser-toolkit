@@ -27,3 +27,13 @@ Thumbs.db
 .env
 *.env
 secrets.*
+*.cookie
+*.cookie.txt
+krisha.cookie*
+networklogs.txt
+networklogs*.txt
+# local screenshots / probe artifacts
+image.png
+_probe_*.py
+_smoke_*.py
+_test_*.py

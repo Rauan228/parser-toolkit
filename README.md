@@ -1,12 +1,12 @@
 # 🧰 parser-toolkit
 
-> Ready-to-run parsers for popular CIS/RU platforms — **2GIS**, **Yandex Maps** and **CIAN**. Pull listings and business data **with open public phone numbers** into clean CSV + JSON. You decide what to collect.
+> Ready-to-run parsers for popular CIS/RU platforms — **2GIS**, **Yandex Maps**, **CIAN** and **Krisha.kz**. Pull listings and business data into clean CSV + JSON. You decide what to collect.
 
 [Русская версия →](README.ru.md)
 
-Each parser targets a source where contact phones are **publicly available** (no CAPTCHA, no "reveal phone" wall). Search **any** category — restaurants, car services, clinics, gyms, real estate, whatever — the parsers don't assume a niche.
+Directory parsers (2GIS / Yandex) collect **public business phones**. Real-estate parsers collect listing metadata; phone rules depend on the site (CIAN phones are open in page state; Krisha full phones need a logged-in browser session — see below).
 
-**No Apify.** Directory parsers talk to the platforms over Direct HTTP.
+**No Apify.** All parsers talk to the platforms over Direct HTTP (stdlib only).
 
 ---
 
@@ -17,12 +17,14 @@ Each parser targets a source where contact phones are **publicly available** (no
 | [`2gis/`](2gis/) | [2GIS](https://2gis.ru) | any business category | Direct HTTP / Internal Catalog Web API | optional | Not required |
 | [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Direct HTTP / Embedded JSON (search HTML) | optional | Not required |
 | [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP / Embedded JSON | 🇷🇺 RU proxy required | Not required |
+| [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | any real-estate section (KZ) | Direct HTTP / HTML list + `window.data` | optional | Not required |
 
 Shared helpers live in [`core/`](core/) (HTTP client, unified place model, CSV/JSON writers).
 
 - **2GIS / Yandex Maps** — business directories: any query + list of cities.
-- **CIAN** — real estate: any section via `CIAN_PATH`.
+- **CIAN / Krisha** — real estate listings (RU / KZ).
 - **2GIS** uses the web key exposed by the 2GIS frontend; no user-provided API key is required.
+- **Krisha** full phones need an optional logged-in browser cookie (`KRISHA_COOKIE`); metadata works without it.
 
 ---
 
@@ -55,20 +57,36 @@ QUERY="барбершоп" CITIES="Москва,Сочи" python yandex-maps/yan
 PROXY="http://user:pass@host:port" CIAN_PATH="snyat-kvartiru-posutochno" python cian/cian_parser.py
 ```
 
+### Krisha.kz — Direct HTTP (KZ real estate)
+
+```bash
+# metadata only (+ phone_preview like "+7 778")
+python krisha/krisha_parser.py --deal arenda --type kvartiry --city almaty --pages 2
+
+# metadata + FULL phones (logged-in Krisha session cookie required)
+# DevTools → open any /a/show/… → Network → document request → copy Cookie header
+# Need krssid + kumd (not Google Ads cookies)
+KRISHA_COOKIE="krishauid=…; krssid=…; kumd=…; …" \
+  python krisha/krisha_parser.py --deal prodazha --type kvartiry --city astana --pages 1 --max 30
+```
+
+> **Note:** the site UI shows «Показать телефон», but with a logged-in session the
+> full number is already in the page JSON (`window.data` → `adverts[].phones`).
+> The parser reads that — no captcha, no click simulation.
+
 Outputs default under `output/`:
 
 ```
 output/twogis_places.json
-output/twogis_places.csv
 output/yandex_maps_places.json
-output/yandex_maps_places.csv
+output/krisha_listings.json
 ```
 
 ---
 
-## 📋 Output fields (directories)
+## 📋 Output fields
 
-Unified shape (JSON):
+### Directories (2GIS / Yandex Maps)
 
 ```json
 {
@@ -77,22 +95,44 @@ Unified shape (JSON):
   "category": "…",
   "phones": ["+7…"],
   "phone": "+7…",
-  "phone2": "",
   "address": "…",
   "city": "…",
   "latitude": 55.75,
   "longitude": 37.62,
   "rating": 4.7,
-  "reviews_count": 120,
-  "website": "https://…",
-  "url": "https://yandex…/maps/org/…",
-  "place_id": "…",
+  "url": "https://…",
   "raw": { }
 }
 ```
 
-**CIAN** keeps its real-estate-specific columns (`price_rub`, `rooms`, `area_m2`, …).
+### Real estate — Krisha example
 
+```json
+{
+  "source": "krisha",
+  "phone": "+77780965105",
+  "phone_preview": "+7 778",
+  "title": "4-комнатная квартира · 130 м²",
+  "city": "Астана",
+  "district": "Сарайшык р-н",
+  "address": "Астана, Сарайшык р-н, Шамши Калдаяков 8",
+  "price_kzt": 185000000,
+  "rooms": 4,
+  "area_m2": 130,
+  "floor": 7,
+  "floors_total": 9,
+  "owner_name": "…",
+  "deal_type": "prodazha",
+  "property_type": "kvartiry",
+  "latitude": 51.11,
+  "longitude": 71.46,
+  "listing_id": "1013203617",
+  "url": "https://krisha.kz/a/show/1013203617",
+  "description": "…"
+}
+```
+
+**CIAN** uses its own columns (`price_rub`, `rooms`, `area_m2`, …).  
 CSV is UTF-8 with BOM for Excel.
 
 ---
@@ -104,6 +144,7 @@ CSV is UTF-8 with BOM for Excel.
 | 2GIS | no user API key (uses the web key exposed by the 2GIS frontend) |
 | Yandex Maps | no user API key (optional proxy if your IP is rate-limited) |
 | CIAN | Russian residential/mobile proxy |
+| Krisha.kz | no user API key; optional `KRISHA_COOKIE` for full phones |
 
 ---
 
@@ -112,6 +153,7 @@ CSV is UTF-8 with BOM for Excel.
 - **2GIS** — `catalog.api.2gis.ru/3.0/items` (+ `region/list`) with the site’s `webApiOutsourceKey`; paginates and maps `contact_groups` → phones/website/email.
 - **Yandex Maps** — fetches public search HTML and parses the SPA hydration JSON at `stack[0].results.items[]`; paginates with `?page=N`. Domain fallback (`yandex.ru` → `yandex.kz` → …) if a host returns `429 limited`.
 - **CIAN** — slices the balanced `"offers":[…]` array from server-rendered page state.
+- **Krisha** — list HTML (`data-product-id`) + detail `window.data`; phones via `/a/ajaxPhones?id=` (login session cookie when Krisha requires auth).
 
 ---
 
@@ -127,6 +169,8 @@ CSV is UTF-8 with BOM for Excel.
 | `CIAN_PATH` | cian | CIAN section |
 | `TWOGIS_KEY` | 2gis | optional Catalog key override |
 | `YANDEX_DOMAINS` | yandex-maps | Maps host fallback list |
+| `KRISHA_COOKIE` / `--cookie` | krisha | browser session cookie for full phones |
+| `--deal` `--type` | krisha | e.g. `arenda` / `kvartiry` |
 
 ---
 

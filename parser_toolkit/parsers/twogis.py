@@ -590,22 +590,10 @@ def parse_start_url(url: str) -> Dict[str, Any]:
 
 
 # --- output ------------------------------------------------------------------
-def dump(rows: Dict[str, Dict[str, Any]]) -> None:
-    data = list(rows.values())
-    out_json = OUT + ".json"
-    out_csv = OUT + ".csv"
-    parent = os.path.dirname(os.path.abspath(out_json))
-    if parent and not os.path.isdir(parent):
-        os.makedirs(parent, exist_ok=True)
-    # JSON keeps everything including raw
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
-    # CSV: flat FIELDS only
-    with open(out_csv, "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.writer(f)
-        w.writerow(FIELDS)
-        for r in data:
-            w.writerow([r.get(k, "") for k in FIELDS])
+def dump(rows: Dict[str, Dict[str, Any]], *, formats: str = "csv,json") -> None:
+    from parser_toolkit.core.output import dump_records
+
+    dump_records(list(rows.values()), OUT, fields=FIELDS, formats=formats, keep_raw=KEEP_RAW, source="2gis")
 
 
 def collect(items: Iterable[Dict[str, Any]], city_name: str, city_slug: str,
@@ -731,27 +719,57 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     p.add_argument("--raw", dest="keep_raw", action="store_true", default=KEEP_RAW)
     p.add_argument("--no-raw", dest="keep_raw", action="store_false")
+    from parser_toolkit.core.cli import add_output_args
+
+    add_output_args(p)
     return p.parse_args(argv)
 
 
-def main(argv: Optional[List[str]] = None) -> None:
+def scrape(
+    *,
+    query: str = "",
+    cities: Optional[List[str]] = None,
+    max_results: Optional[int] = None,
+    start_urls: Optional[List[str]] = None,
+    proxy: str = "",
+    timeout: Optional[float] = None,
+    retries: Optional[int] = None,
+    sleep: Optional[float] = None,
+    page_size: Optional[int] = None,
+    keep_raw: bool = True,
+    out: Optional[str] = None,
+    formats: str = "csv,json",
+    resume: bool = False,
+    write: Optional[bool] = None,
+) -> List[Dict[str, Any]]:
+    """Collect 2GIS places. Writes files only when ``out`` is set (or write=True)."""
     global OUT, MAX, PAGE_SIZE, TIMEOUT, RETRIES, SLEEP, PROXY, QUERY, START_URLS, KEEP_RAW
 
-    args = parse_args(argv)
-    OUT = args.out
-    MAX = args.max
-    PAGE_SIZE = min(50, max(1, args.page_size))
-    TIMEOUT = args.timeout
-    RETRIES = args.retries
-    SLEEP = args.sleep
-    PROXY = (args.proxy or "").strip()
-    QUERY = args.query
-    KEEP_RAW = args.keep_raw
-    if args.start_urls:
-        START_URLS = args.start_urls
-    if args.cities:
-        os.environ["CITIES"] = ",".join(args.cities)
+    from parser_toolkit.core.report import RunReport, persist_run
+    from parser_toolkit.core.resume import load_checkpoint, seed_rows
 
+    QUERY = query or QUERY
+    if max_results is not None:
+        MAX = max_results
+    if page_size is not None:
+        PAGE_SIZE = min(50, max(1, page_size))
+    if timeout is not None:
+        TIMEOUT = timeout
+    if retries is not None:
+        RETRIES = retries
+    if sleep is not None:
+        SLEEP = sleep
+    PROXY = (proxy or PROXY or "").strip()
+    KEEP_RAW = keep_raw
+    if start_urls:
+        START_URLS = start_urls
+    if cities:
+        os.environ["CITIES"] = ",".join(cities)
+    if out:
+        OUT = out
+    should_write = write if write is not None else bool(out)
+
+    report = RunReport(source="2gis")
     print("2GIS parser — direct Catalog web API (no Apify)")
     if PROXY:
         print(f"proxy: {PROXY.split('@')[-1] if '@' in PROXY else PROXY}")
@@ -763,25 +781,34 @@ def main(argv: Optional[List[str]] = None) -> None:
         raise
     except Exception as e:
         print(f"WARNING: region warmup failed ({e}); continuing with key as-is")
+        report.add_error(f"region warmup: {e}")
 
     rows: Dict[str, Dict[str, Any]] = {}
+    if resume and OUT:
+        n = seed_rows(rows, load_checkpoint(OUT), key_fn=lambda r: r.get("phone") or "")
+        report.resumed = True
+        report.resumed_from = n
+        if n:
+            print(f"resume: loaded {n} existing phones from {OUT}.*")
 
     if START_URLS:
         for url in START_URLS:
             info = parse_start_url(url)
             slug = info["city_slug"] or "moscow"
             city_name = dict(DEFAULT_CITIES).get(slug, slug)
-            query = info["query"] or QUERY
+            q = info["query"] or QUERY
             rubric_id = info["rubric_id"]
-            print(f"[{slug}] url query={query!r} rubric={rubric_id or '-'} …")
+            print(f"[{slug}] url query={q!r} rubric={rubric_id or '-'} …")
             try:
-                new = run_for_city(key, slug, city_name, query, rubric_id, rows)
+                new = run_for_city(key, slug, city_name, q, rubric_id, rows)
             except PermissionError as e:
                 print(f"    auth error: {e}")
+                report.add_error(str(e))
                 key = ensure_key(key, force_refresh=True)
-                new = run_for_city(key, slug, city_name, query, rubric_id, rows)
+                new = run_for_city(key, slug, city_name, q, rubric_id, rows)
             print(f"[{slug}] +{new} | total={len(rows)}")
-            dump(rows)
+            if should_write:
+                dump(rows, formats=formats)
     else:
         for slug, city_name in _cities():
             print(f"[{city_name}] query={QUERY!r} …")
@@ -789,13 +816,47 @@ def main(argv: Optional[List[str]] = None) -> None:
                 new = run_for_city(key, slug, city_name, QUERY, "", rows)
             except PermissionError as e:
                 print(f"    auth error: {e}")
+                report.add_error(str(e))
                 key = ensure_key(key, force_refresh=True)
                 new = run_for_city(key, slug, city_name, QUERY, "", rows)
             print(f"[{city_name}] +{new} | total={len(rows)}")
-            dump(rows)
+            if should_write:
+                dump(rows, formats=formats)
 
-    dump(rows)
-    print(f"\nDone: {len(rows)} unique phones -> {OUT}.csv / {OUT}.json")
+    records = list(rows.values())
+    if should_write:
+        persist_run(
+            records,
+            OUT,
+            fields=FIELDS,
+            formats=formats,
+            keep_raw=KEEP_RAW,
+            source="2gis",
+            report=report,
+        )
+    else:
+        report.finish(records=records)
+    return records
+
+
+def main(argv: Optional[List[str]] = None) -> None:
+    args = parse_args(argv)
+    scrape(
+        query=args.query,
+        cities=args.cities,
+        max_results=args.max,
+        start_urls=args.start_urls,
+        proxy=args.proxy or "",
+        timeout=args.timeout,
+        retries=args.retries,
+        sleep=args.sleep,
+        page_size=args.page_size,
+        keep_raw=args.keep_raw,
+        out=args.out,
+        formats=getattr(args, "formats", "csv,json"),
+        resume=getattr(args, "resume", False),
+        write=True,
+    )
     return 0
 
 

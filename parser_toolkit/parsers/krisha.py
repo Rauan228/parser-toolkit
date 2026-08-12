@@ -406,10 +406,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     p.add_argument("--timeout", type=float, default=float(os.environ.get("TIMEOUT", "30")))
     p.add_argument("--retries", type=int, default=int(os.environ.get("RETRIES", "4")))
     p.add_argument("--sleep", type=float, default=float(os.environ.get("SLEEP", "0.45")))
-    p.add_argument(
-        "--cookie",
-        default=os.environ.get("KRISHA_COOKIE", ""),
-        help="browser Cookie header after login (required for full phones)",
+    from parser_toolkit.core.cli import add_cookie_args, add_output_args
+
+    add_cookie_args(
+        p,
+        env_name="KRISHA_COOKIE",
+        help_cookie="browser Cookie header after login (required for full phones)",
     )
     p.add_argument(
         "--skip-phones",
@@ -418,6 +420,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     p.add_argument("--raw", dest="keep_raw", action="store_true", default=True)
     p.add_argument("--no-raw", dest="keep_raw", action="store_false")
+    add_output_args(p)
     return p.parse_args(argv)
 
 
@@ -430,69 +433,94 @@ def resolve_cities(cli: Optional[List[str]]) -> List[str]:
     return list(DEFAULT_CITIES)
 
 
-def dump_rows(rows: Dict[str, Dict[str, Any]], out_base: str, keep_raw: bool) -> None:
-    """Write CSV/JSON; adapt Place dump by writing dicts directly."""
-    data = list(rows.values())
-    if not keep_raw:
-        for r in data:
-            r.pop("raw", None)
+def dump_rows(
+    rows: Dict[str, Dict[str, Any]],
+    out_base: str,
+    keep_raw: bool,
+    *,
+    formats: str = "csv,json",
+) -> None:
+    from parser_toolkit.core.output import dump_records
 
-    parent = os.path.dirname(os.path.abspath(out_base + ".json"))
-    if parent and not os.path.isdir(parent):
-        os.makedirs(parent, exist_ok=True)
-
-    with open(out_base + ".json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
-
-    import csv
-
-    with open(out_base + ".csv", "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.writer(f)
-        w.writerow(CSV_FIELDS)
-        for r in data:
-            w.writerow([r.get(k, "") for k in CSV_FIELDS])
+    dump_records(list(rows.values()), out_base, fields=CSV_FIELDS, formats=formats, keep_raw=keep_raw, source=SOURCE)
 
 
-def main(argv: Optional[List[str]] = None) -> None:
-    args = parse_args(argv)
-    cities = resolve_cities(args.cities)
-    cookie = (args.cookie or "").strip()
+def scrape(
+    *,
+    deal: str = "arenda",
+    property_type: str = "kvartiry",
+    cities: Optional[List[str]] = None,
+    pages: int = 3,
+    max_per_city: int = 100,
+    cookie: str = "",
+    cookie_file: str = "",
+    skip_phones: bool = False,
+    proxy: str = "",
+    timeout: float = 30.0,
+    retries: int = 4,
+    sleep: float = 0.45,
+    keep_raw: bool = True,
+    out: Optional[str] = None,
+    formats: str = "csv,json",
+    resume: bool = False,
+    write: Optional[bool] = None,
+) -> List[Dict[str, Any]]:
+    """Collect Krisha listings. Writes files only when ``out`` is set."""
+    from parser_toolkit.core.cookies import cookie_status, load_cookie
+    from parser_toolkit.core.report import RunReport, persist_run
+    from parser_toolkit.core.resume import load_checkpoint, seed_rows
+    from parser_toolkit.core.schema import phone_metrics
+
+    city_list = resolve_cities(cities)
+    cookie = load_cookie(cookie=cookie, cookie_file=cookie_file, env_names=("KRISHA_COOKIE",))
+    should_write = write if write is not None else bool(out)
+    report = RunReport(source=SOURCE)
+    report.extra["cookie"] = cookie_status(cookie)
+    report.extra["skip_phones"] = skip_phones
 
     print("Krisha.kz parser — Direct HTTP (list + detail + phones)")
-    print(f"deal={args.deal} type={args.property_type} cities={cities} pages={args.pages} max/city={args.max}")
+    print(f"deal={deal} type={property_type} cities={city_list} pages={pages} max/city={max_per_city}")
     if cookie:
-        print("phones: KRISHA_COOKIE set (session mode B)")
-    elif args.skip_phones:
+        print("phones: cookie set (session)")
+    elif skip_phones:
         print("phones: skipped (--skip-phones)")
     else:
         print(
             "phones: no KRISHA_COOKIE — will try public ajaxPhones; "
             "if Krisha requires login, only phone_preview will be filled.\n"
-            "         Set KRISHA_COOKIE from a logged-in browser for full numbers."
+            "         Set KRISHA_COOKIE or --cookie-file for full numbers."
         )
 
     client = HttpClient(
-        timeout=args.timeout,
-        retries=args.retries,
-        proxy=args.proxy,
-        sleep_base=max(args.sleep, 0.2),
+        timeout=timeout,
+        retries=retries,
+        proxy=proxy,
+        sleep_base=max(sleep, 0.2),
         cookie=cookie,
     )
 
-    rows: Dict[str, Dict[str, Any]] = {}  # by listing_id
+    rows: Dict[str, Dict[str, Any]] = {}
+    if resume and out:
+        n = seed_rows(rows, load_checkpoint(out))
+        report.resumed = True
+        report.resumed_from = n
+        if n:
+            print(f"resume: loaded {n} existing listings from {out}.*")
+
     auth_warned = False
     phones_ok = 0
     phones_blocked = 0
 
-    for city in cities:
+    for city in city_list:
         display = CITY_NAMES.get(city, city)
         print(f"[{display} / {city}] …")
         ids: List[str] = []
-        for page in range(1, args.pages + 1):
+        for page in range(1, pages + 1):
             try:
-                batch = fetch_list_ids(client, args.deal, args.property_type, city, page)
+                batch = fetch_list_ids(client, deal, property_type, city, page)
             except HttpError as e:
                 print(f"    list page {page} error: {e}")
+                report.add_error(f"list {city} p{page}: {e}")
                 break
             if not batch:
                 print(f"    page {page}: empty")
@@ -500,10 +528,10 @@ def main(argv: Optional[List[str]] = None) -> None:
             new = [i for i in batch if i not in ids]
             ids.extend(new)
             print(f"    page {page}: +{len(new)} ids (bag={len(ids)})")
-            if len(ids) >= args.max:
-                ids = ids[: args.max]
+            if len(ids) >= max_per_city:
+                ids = ids[: max_per_city]
                 break
-            time.sleep(args.sleep)
+            time.sleep(sleep)
 
         city_new = 0
         for n, lid in enumerate(ids, 1):
@@ -513,25 +541,24 @@ def main(argv: Optional[List[str]] = None) -> None:
                 data = fetch_detail(client, lid)
             except HttpError as e:
                 print(f"    detail {lid} error: {e}")
-                time.sleep(args.sleep)
+                report.add_error(f"detail {lid}: {e}")
+                time.sleep(sleep)
                 continue
             if not data:
                 print(f"    detail {lid}: no window.data")
-                time.sleep(args.sleep)
+                time.sleep(sleep)
                 continue
 
-            # Prefer phones already embedded in window.data (logged-in SSR).
             row = normalize_listing(
                 data,
                 fallback_city=display,
-                deal_type=args.deal,
-                property_type=args.property_type,
+                deal_type=deal,
+                property_type=property_type,
                 phones=None,
-                keep_raw=args.keep_raw,
+                keep_raw=keep_raw,
             )
 
-            # Fallback: ajaxPhones only if page did not embed full numbers.
-            if not row.get("phone") and not args.skip_phones:
+            if not row.get("phone") and not skip_phones:
                 phone_list, status = fetch_phones(client, lid)
                 if status == "auth_required":
                     phones_blocked += 1
@@ -545,47 +572,84 @@ def main(argv: Optional[List[str]] = None) -> None:
                         auth_warned = True
                 elif status == "ok" and phone_list:
                     phones_ok += 1
-                    # re-normalize with ajax phones
                     row = normalize_listing(
                         data,
                         fallback_city=display,
-                        deal_type=args.deal,
-                        property_type=args.property_type,
+                        deal_type=deal,
+                        property_type=property_type,
                         phones=phone_list,
-                        keep_raw=args.keep_raw,
+                        keep_raw=keep_raw,
                     )
-                time.sleep(args.sleep * 0.5)
+                time.sleep(sleep * 0.5)
             elif row.get("phone"):
                 phones_ok += 1
-            # key: prefer phone if present else listing id
-            key = row.get("phone") or f"id:{lid}"
-            if key in rows and row.get("phone"):
-                # already have this phone
-                pass
             rows[str(lid)] = row
             city_new += 1
             if n % 10 == 0:
                 print(f"    processed {n}/{len(ids)} | stored={len(rows)}")
-            time.sleep(args.sleep)
+            time.sleep(sleep)
 
         print(f"[{display}] +{city_new} | total={len(rows)}")
-        dump_rows(rows, args.out, args.keep_raw)
+        if should_write and out:
+            dump_rows(rows, out, keep_raw, formats=formats)
 
-    dump_rows(rows, args.out, args.keep_raw)
-    with_phone = sum(1 for r in rows.values() if r.get("phone"))
-    with_preview = sum(1 for r in rows.values() if r.get("phone_preview"))
+    records = list(rows.values())
+    extra = {
+        "ajaxPhones_ok": phones_ok,
+        "ajaxPhones_blocked": phones_blocked,
+    }
+    extra.update(phone_metrics(records))
+    if should_write and out:
+        persist_run(
+            records,
+            out,
+            fields=CSV_FIELDS,
+            formats=formats,
+            keep_raw=keep_raw,
+            source=SOURCE,
+            report=report,
+            extra_phones=extra,
+        )
+    else:
+        report.finish(records=records, extra_phones=extra)
+
+    metrics = phone_metrics(records)
     print(
-        f"\nDone: {len(rows)} listings -> {args.out}.csv / {args.out}.json"
-        f"\n  full phones: {with_phone} | phone_preview: {with_preview}"
-        f" | ajaxPhones ok={phones_ok} blocked={phones_blocked}"
+        f"  phones: full={metrics['with_phone']} preview={metrics['with_preview']} "
+        f"none={metrics['without_phone']} rate={metrics['phone_rate']} "
+        f"| ajax ok={phones_ok} blocked={phones_blocked}"
     )
-    if with_phone == 0 and not cookie and not args.skip_phones:
+    if metrics["with_phone"] == 0 and not cookie and not skip_phones:
         print(
             "\nNOTE: Full phones need a logged-in session.\n"
             "  1) Open krisha.kz in browser and sign in\n"
             "  2) DevTools → Network → any request → copy 'cookie' request header\n"
-            "  3) KRISHA_COOKIE='…' parser-toolkit krisha …\n"
+            "  3) --cookie-file PATH  or  KRISHA_COOKIE='…' parser-toolkit krisha …\n"
         )
+    return records
+
+
+def main(argv: Optional[List[str]] = None) -> None:
+    args = parse_args(argv)
+    scrape(
+        deal=args.deal,
+        property_type=args.property_type,
+        cities=args.cities,
+        pages=args.pages,
+        max_per_city=args.max,
+        cookie=args.cookie or "",
+        cookie_file=getattr(args, "cookie_file", "") or "",
+        skip_phones=args.skip_phones,
+        proxy=args.proxy or "",
+        timeout=args.timeout,
+        retries=args.retries,
+        sleep=args.sleep,
+        keep_raw=args.keep_raw,
+        out=args.out,
+        formats=getattr(args, "formats", "csv,json"),
+        resume=getattr(args, "resume", False),
+        write=True,
+    )
     return 0
 
 

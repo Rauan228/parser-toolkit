@@ -441,25 +441,23 @@ def fetch_phones_playwright(
 
 
 # --- output ------------------------------------------------------------------
-def dump_rows(rows: Dict[str, Dict[str, Any]], out_base: str, keep_raw: bool) -> None:
-    data = list(rows.values())
-    if not keep_raw:
-        for r in data:
-            r.pop("raw", None)
-            r.pop("params", None)
+def dump_rows(
+    rows: Dict[str, Dict[str, Any]],
+    out_base: str,
+    keep_raw: bool,
+    *,
+    formats: str = "csv,json",
+) -> None:
+    from parser_toolkit.core.output import dump_records
 
-    parent = os.path.dirname(os.path.abspath(out_base + ".json"))
-    if parent and not os.path.isdir(parent):
-        os.makedirs(parent, exist_ok=True)
-
-    with open(out_base + ".json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
-
-    with open(out_base + ".csv", "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.writer(f)
-        w.writerow(CSV_FIELDS)
-        for r in data:
-            w.writerow([r.get(k, "") for k in CSV_FIELDS])
+    dump_records(
+        list(rows.values()),
+        out_base,
+        fields=CSV_FIELDS,
+        formats=formats,
+        keep_raw=keep_raw,
+        source=SOURCE,
+    )
 
 
 # --- CLI ---------------------------------------------------------------------
@@ -487,10 +485,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     p.add_argument("--timeout", type=float, default=float(os.environ.get("TIMEOUT", "30")))
     p.add_argument("--retries", type=int, default=int(os.environ.get("RETRIES", "4")))
     p.add_argument("--sleep", type=float, default=float(os.environ.get("SLEEP", "0.5")))
-    p.add_argument(
-        "--cookie",
-        default=os.environ.get("KOLESA_COOKIE", ""),
-        help="browser Cookie header (klssid + kumd recommended)",
+    from parser_toolkit.core.cli import add_cookie_args, add_output_args
+
+    add_cookie_args(
+        p,
+        env_name="KOLESA_COOKIE",
+        help_cookie="browser Cookie header (klssid + kumd recommended)",
     )
     p.add_argument(
         "--no-phones",
@@ -504,6 +504,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     p.add_argument("--raw", dest="keep_raw", action="store_true", default=True)
     p.add_argument("--no-raw", dest="keep_raw", action="store_false")
+    add_output_args(p)
     return p.parse_args(argv)
 
 
@@ -516,18 +517,46 @@ def resolve_cities(cli: Optional[List[str]]) -> List[str]:
     return list(DEFAULT_CITIES)
 
 
-def main(argv: Optional[List[str]] = None) -> None:
-    args = parse_args(argv)
-    cities = resolve_cities(args.cities)
-    cookie = (args.cookie or "").strip()
-    want_phones = not args.no_phones
+def scrape(
+    *,
+    section: str = "cars",
+    cities: Optional[List[str]] = None,
+    pages: int = 2,
+    max_per_city: int = 50,
+    cookie: str = "",
+    cookie_file: str = "",
+    no_phones: bool = False,
+    headed: bool = False,
+    proxy: str = "",
+    timeout: float = 30.0,
+    retries: int = 4,
+    sleep: float = 0.5,
+    keep_raw: bool = True,
+    out: Optional[str] = None,
+    formats: str = "csv,json",
+    resume: bool = False,
+    write: Optional[bool] = None,
+) -> List[Dict[str, Any]]:
+    """Collect Kolesa listings. Writes files only when ``out`` is set."""
+    from parser_toolkit.core.cookies import cookie_status, load_cookie
+    from parser_toolkit.core.report import RunReport, persist_run
+    from parser_toolkit.core.resume import load_checkpoint, seed_rows
+    from parser_toolkit.core.schema import phone_metrics
+
+    city_list = resolve_cities(cities)
+    cookie = load_cookie(cookie=cookie, cookie_file=cookie_file, env_names=("KOLESA_COOKIE",))
+    want_phones = not no_phones
+    should_write = write if write is not None else bool(out)
+    report = RunReport(source=SOURCE)
+    report.extra["cookie"] = cookie_status(cookie)
+    report.extra["phones_required"] = want_phones
 
     print("Kolesa.kz parser — HTTP metadata + Playwright phones")
-    print(f"section={args.section} cities={cities} pages={args.pages} max/city={args.max}")
+    print(f"section={section} cities={city_list} pages={pages} max/city={max_per_city}")
     if want_phones:
         print("phones: ON (Playwright + app.kolesa.kz /adverts/{id}/phones + reCAPTCHA v3 in browser)")
         if cookie:
-            print("session: KOLESA_COOKIE set")
+            print("session: cookie set")
         else:
             print("session: no cookie (browser guest; login cookie recommended)")
     else:
@@ -546,26 +575,34 @@ def main(argv: Optional[List[str]] = None) -> None:
             raise SystemExit(2)
 
     client = HttpClient(
-        timeout=args.timeout,
-        retries=args.retries,
-        proxy=args.proxy,
-        sleep_base=max(args.sleep, 0.2),
+        timeout=timeout,
+        retries=retries,
+        proxy=proxy,
+        sleep_base=max(sleep, 0.2),
         cookie=cookie,
     )
 
     rows: Dict[str, Dict[str, Any]] = {}
+    if resume and out:
+        n = seed_rows(rows, load_checkpoint(out))
+        report.resumed = True
+        report.resumed_from = n
+        if n:
+            print(f"resume: loaded {n} existing listings from {out}.*")
+
     phones_ok = 0
     phones_fail = 0
 
-    for city in cities:
+    for city in city_list:
         display = CITY_NAMES.get(city, city)
         print(f"[{display} / {city}] …")
         ids: List[str] = []
-        for page in range(1, args.pages + 1):
+        for page in range(1, pages + 1):
             try:
-                batch = fetch_list_ids(client, args.section, city, page)
+                batch = fetch_list_ids(client, section, city, page)
             except HttpError as e:
                 print(f"    list page {page} error: {e}")
+                report.add_error(f"list {city} p{page}: {e}")
                 break
             if not batch:
                 print(f"    page {page}: empty")
@@ -573,10 +610,10 @@ def main(argv: Optional[List[str]] = None) -> None:
             new = [i for i in batch if i not in ids]
             ids.extend(new)
             print(f"    page {page}: +{len(new)} ids (bag={len(ids)})")
-            if len(ids) >= args.max:
-                ids = ids[: args.max]
+            if len(ids) >= max_per_city:
+                ids = ids[: max_per_city]
                 break
-            time.sleep(args.sleep)
+            time.sleep(sleep)
 
         city_new = 0
         for n, lid in enumerate(ids, 1):
@@ -586,7 +623,8 @@ def main(argv: Optional[List[str]] = None) -> None:
                 html, var_data = fetch_detail(client, lid)
             except HttpError as e:
                 print(f"    detail {lid} error: {e}")
-                time.sleep(args.sleep)
+                report.add_error(f"detail {lid}: {e}")
+                time.sleep(sleep)
                 continue
 
             phone_list: List[str] = []
@@ -595,7 +633,7 @@ def main(argv: Optional[List[str]] = None) -> None:
                     phone_list = fetch_phones_playwright(
                         lid,
                         cookie=cookie,
-                        headless=not args.headed,
+                        headless=not headed,
                     )
                     if phone_list:
                         phones_ok += 1
@@ -612,12 +650,11 @@ def main(argv: Optional[List[str]] = None) -> None:
                 var_data=var_data,
                 phones=phone_list,
                 fallback_city=display,
-                keep_raw=args.keep_raw,
+                keep_raw=keep_raw,
             )
-            # skip listings without phone when phones required
             if want_phones and not row.get("phone"):
                 print(f"    {lid}: skipped (no phone)")
-                time.sleep(args.sleep)
+                time.sleep(sleep)
                 continue
 
             rows[lid] = row
@@ -626,17 +663,60 @@ def main(argv: Optional[List[str]] = None) -> None:
                 f"    {lid}: phone={row.get('phone')!r} | {row.get('price_kzt')} ₸ | "
                 f"{row.get('title')}"
             )
-            if n % 5 == 0:
-                dump_rows(rows, args.out, args.keep_raw)
-            time.sleep(args.sleep)
+            if should_write and out and n % 5 == 0:
+                dump_rows(rows, out, keep_raw, formats=formats)
+            time.sleep(sleep)
 
         print(f"[{display}] +{city_new} | total={len(rows)}")
-        dump_rows(rows, args.out, args.keep_raw)
+        if should_write and out:
+            dump_rows(rows, out, keep_raw, formats=formats)
 
-    dump_rows(rows, args.out, args.keep_raw)
+    records = list(rows.values())
+    extra = {
+        "phones_ok": phones_ok,
+        "phones_fail": phones_fail,
+    }
+    extra.update(phone_metrics(records))
+    if should_write and out:
+        persist_run(
+            records,
+            out,
+            fields=CSV_FIELDS,
+            formats=formats,
+            keep_raw=keep_raw,
+            source=SOURCE,
+            report=report,
+            extra_phones=extra,
+        )
+    else:
+        report.finish(records=records, extra_phones=extra)
     print(
-        f"\nDone: {len(rows)} listings -> {args.out}.csv / {args.out}.json"
-        f"\n  phones ok={phones_ok} fail={phones_fail}"
+        f"  phones: ok={phones_ok} fail={phones_fail} "
+        f"full={extra.get('with_phone', 0)} rate={extra.get('phone_rate', 0)}"
+    )
+    return records
+
+
+def main(argv: Optional[List[str]] = None) -> None:
+    args = parse_args(argv)
+    scrape(
+        section=args.section,
+        cities=args.cities,
+        pages=args.pages,
+        max_per_city=args.max,
+        cookie=args.cookie or "",
+        cookie_file=getattr(args, "cookie_file", "") or "",
+        no_phones=args.no_phones,
+        headed=args.headed,
+        proxy=args.proxy or "",
+        timeout=args.timeout,
+        retries=args.retries,
+        sleep=args.sleep,
+        keep_raw=args.keep_raw,
+        out=args.out,
+        formats=getattr(args, "formats", "csv,json"),
+        resume=getattr(args, "resume", False),
+        write=True,
     )
     return 0
 

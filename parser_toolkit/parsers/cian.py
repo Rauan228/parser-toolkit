@@ -31,6 +31,7 @@ import json
 import os
 import re
 import ssl
+import sys
 import time
 import urllib.request
 
@@ -64,7 +65,7 @@ def _cities():
     by_slug = {s: n for s, n in DEFAULT_CITIES}
     return [(s.strip(), by_slug.get(s.strip(), s.strip())) for s in env.split(",")]
 
-FIELDS = ["phone", "phone2", "city", "price_rub", "rooms", "area_m2",
+FIELDS = ["source", "phone", "phone2", "city", "price_rub", "rooms", "area_m2",
           "floor", "floors_total", "address", "metro", "build_year", "furniture",
           "deposit", "owner_id", "posted", "description", "url"]
 
@@ -181,7 +182,14 @@ def row_of(o, fallback_city):
     if not addr:  # incomplete parse — skip, we only want full cards
         return None
     bt = o.get("bargainTerms") or {}
+    url = o.get("fullUrl") or ""
+    oid = o.get("cianId") or o.get("id") or ""
     return {
+        "source": "cian",
+        "id": str(oid) if oid else "",
+        "listing_id": str(oid) if oid else "",
+        "title": o.get("formattedTitle") or o.get("title") or "",
+        "phones": phones,
         "phone": phones[0], "phone2": phones[1] if len(phones) > 1 else "",
         "city": _geo_city(o) or fallback_city,
         "price_rub": bt.get("priceRur") or o.get("formattedFullPrice") or "",
@@ -193,49 +201,76 @@ def row_of(o, fallback_city):
         "deposit": (o.get("offerInfo") or {}).get("deposit", "") if isinstance(o.get("offerInfo"), dict) else "",
         "owner_id": o.get("cianUserId") or "", "posted": o.get("creationDate") or o.get("added") or "",
         "description": re.sub(r"\s+", " ", (o.get("description") or ""))[:400],
-        "url": o.get("fullUrl") or "",
+        "url": url,
     }
 
-def dump(rows):
-    data = list(rows.values())
-    parent = os.path.dirname(os.path.abspath(OUT + ".json"))
-    if parent and not os.path.isdir(parent):
-        os.makedirs(parent, exist_ok=True)
-    with open(OUT + ".json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
-    with open(OUT + ".csv", "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.writer(f)
-        w.writerow(FIELDS)
-        for r in data:
-            w.writerow([r.get(k, "") for k in FIELDS])
+def dump(rows, *, formats="csv,json"):
+    from parser_toolkit.core.output import dump_records
+
+    dump_records(list(rows.values()), OUT, fields=FIELDS, formats=formats, keep_raw=True, source="cian")
 
 
 def parse_args(argv=None):
+    from parser_toolkit.core.cli import add_output_args
+
     p = argparse.ArgumentParser(description="CIAN listings parser (Direct HTTP / embedded JSON)")
-    p.add_argument("--proxy", default=PROXY, help="RU proxy http://user:pass@host:port")
+    p.add_argument("--proxy", default=PROXY, help="RU proxy http://user:pass@host:port (required)")
     p.add_argument("--path", dest="cian_path", default=CIAN_PATH, help="CIAN section path")
     p.add_argument("-c", "--city", action="append", dest="cities", default=None,
                    help="CIAN subdomain (www=Moscow). Also CITIES=www,spb")
     p.add_argument("--pages", type=int, default=PAGES)
     p.add_argument("--out", default=OUT)
+    add_output_args(p)
     return p.parse_args(argv)
 
 
-def main(argv=None):
+def scrape(
+    *,
+    proxy="",
+    cian_path="",
+    cities=None,
+    pages=None,
+    out=None,
+    formats="csv,json",
+    resume=False,
+    write=None,
+    require_proxy=True,
+):
+    """Collect CIAN listings. RU proxy is required unless require_proxy=False."""
     global PROXY, OUT, PAGES, CIAN_PATH
-    args = parse_args(argv)
-    PROXY = (args.proxy or "").strip()
-    OUT = args.out
-    PAGES = args.pages
-    CIAN_PATH = args.cian_path.strip("/")
-    if args.cities:
-        os.environ["CITIES"] = ",".join(args.cities)
+    from parser_toolkit.core.exitcodes import EXIT_BLOCKED
+    from parser_toolkit.core.report import RunReport, persist_run
+    from parser_toolkit.core.resume import load_checkpoint, seed_rows
 
-    if not PROXY:
-        print("WARNING: no PROXY set. CIAN geo-blocks non-RU IPs — set a Russian "
-              "residential/mobile proxy via --proxy / PROXY, e.g.\n"
-              '  parser-toolkit cian --proxy "http://user:pass@host:port"')
+    PROXY = (proxy if proxy is not None else PROXY or "").strip()
+    if cian_path:
+        CIAN_PATH = cian_path.strip("/")
+    if pages is not None:
+        PAGES = pages
+    if cities:
+        os.environ["CITIES"] = ",".join(cities)
+    if out:
+        OUT = out
+    should_write = write if write is not None else bool(out)
+
+    if require_proxy and not PROXY:
+        print(
+            "ERROR: CIAN requires a Russian residential/mobile proxy.\n"
+            "  parser-toolkit cian --proxy \"http://user:pass@host:port\"\n"
+            "  or set PROXY=...",
+            file=sys.stderr,
+        )
+        raise SystemExit(EXIT_BLOCKED)
+
+    report = RunReport(source="cian")
     rows = {}
+    if resume and OUT:
+        n = seed_rows(rows, load_checkpoint(OUT), key_fn=lambda r: r.get("phone") or "")
+        report.resumed = True
+        report.resumed_from = n
+        if n:
+            print(f"resume: loaded {n} existing phones from {OUT}.*")
+
     for slug, city in _cities():
         base = f"https://{slug}.cian.ru/{CIAN_PATH}/"
         new = 0
@@ -254,9 +289,31 @@ def main(argv=None):
                     new += 1
                 time.sleep(1.1)
         print(f"[{city}] +{new} | total={len(rows)}")
-        dump(rows)
-    dump(rows)
-    print(f"\nDone: {len(rows)} unique listings -> {OUT}.csv / {OUT}.json")
+        if should_write:
+            dump(rows, formats=formats)
+    records = list(rows.values())
+    if should_write:
+        persist_run(
+            records, OUT, fields=FIELDS, formats=formats, keep_raw=True, source="cian", report=report
+        )
+    else:
+        report.finish(records=records)
+    return records
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    scrape(
+        proxy=args.proxy or "",
+        cian_path=args.cian_path,
+        cities=args.cities,
+        pages=args.pages,
+        out=args.out,
+        formats=getattr(args, "formats", "csv,json"),
+        resume=getattr(args, "resume", False),
+        write=True,
+        require_proxy=True,
+    )
     return 0
 
 

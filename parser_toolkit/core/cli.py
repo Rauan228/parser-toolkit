@@ -45,6 +45,38 @@ def add_common_args(
         action="store_false",
         help="drop raw objects from JSON",
     )
+    add_output_args(parser)
+    return parser
+
+
+def add_output_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    parser.add_argument(
+        "--format",
+        dest="formats",
+        default=env("FORMAT", "csv,json"),
+        help="output formats: csv,json,jsonl (comma-separated)",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        default=env("RESUME", "") in ("1", "true", "yes"),
+        help="skip records already present in {out}.json / {out}.jsonl",
+    )
+    return parser
+
+
+def add_cookie_args(
+    parser: argparse.ArgumentParser,
+    *,
+    env_name: str,
+    help_cookie: str = "browser Cookie header",
+) -> argparse.ArgumentParser:
+    parser.add_argument("--cookie", default=env(env_name, ""), help=help_cookie)
+    parser.add_argument(
+        "--cookie-file",
+        default=env("COOKIE_FILE", ""),
+        help="path to a file containing the Cookie header (preferred over env)",
+    )
     return parser
 
 

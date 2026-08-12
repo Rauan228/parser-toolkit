@@ -68,20 +68,28 @@ No Apify. Primarily direct HTTP; Playwright only for Kolesa phones.
 
 usage:
   parser-toolkit <source> [options]
+  parser-toolkit doctor [--live]
   python -m parser_toolkit <source> [options]
 
 sources:
   2gis           2GIS businesses (Catalog web API)
   yandex-maps    Yandex Maps businesses (embedded JSON)
-  cian           CIAN real estate (embedded JSON, RU proxy)
+  cian           CIAN real estate (embedded JSON, RU proxy required)
   krisha         Krisha.kz real estate (window.data + cookie phones)
   kolesa         Kolesa.kz autos (HTTP + Playwright phones)
 
+common flags:
+  --out PREFIX           output path without extension (writes CSV/JSON + .run.json)
+  --format csv,json,jsonl
+  --resume               skip ids already in PREFIX.json / PREFIX.jsonl
+  --cookie-file PATH     session cookie from a file (krisha / kolesa)
+
 examples:
+  parser-toolkit doctor
   parser-toolkit 2gis --query "кофейни" --city moscow --max 50
   parser-toolkit yandex-maps --query "стоматология" --city "Астана"
   parser-toolkit cian --proxy http://user:pass@host:port --pages 3
-  parser-toolkit krisha --city almaty --max 30
+  parser-toolkit krisha --city almaty --max 30 --cookie-file ./krisha.cookie
   KOLESA_COOKIE="…" parser-toolkit kolesa --city almaty --max 15
 
   parser-toolkit 2gis --help
@@ -103,6 +111,10 @@ def run(argv: Optional[List[str]] = None) -> int:
     if argv[0] in ("-V", "--version", "version"):
         print(f"parser-toolkit {__version__}")
         return 0
+    if argv[0] in ("doctor", "check"):
+        from parser_toolkit.doctor import run_doctor
+
+        return run_doctor(argv[1:])
 
     source_key = argv[0]
     if source_key not in ALIASES:

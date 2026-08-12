@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.2.0] — 2026-08-10
+
+Hardening of the five v0.1 parsers — no new sources.
+
+### Added
+
+- **CI**: GitHub Actions (`unittest` + CLI smoke on Python 3.9 / 3.12)
+- **`parser-toolkit doctor`**: offline environment check (`--live` optional)
+- **Run report**: `{out}.run.json` (counts, phone metrics, errors, duration)
+- **JSONL**: `--format csv,json,jsonl`
+- **`--cookie-file`**: Krisha / Kolesa session cookie from a file
+- **`--resume`**: skip ids already present in `{out}.json` / `{out}.jsonl`
+- **Library API**: `from parser_toolkit import scrape, sources`
+
+### Changed
+
+- **CIAN** refuses to run without `--proxy` / `PROXY` (exit `4`)
+- Krisha / Kolesa print and persist **phone metrics** (full / preview / fail rate)
+- Unified record keys filled on dump: `source`, `id`, `title`, `phones`, `price`, `currency`, `scraped_at`
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | ok |
+| 1 | runtime error |
+| 2 | bad args / missing optional extra (Playwright) |
+| 3 | auth (reserved) |
+| 4 | blocked / missing required proxy |
+
 ## [0.1.0] — 2026-08-10
 
 First tagged release of **parser-toolkit**.

@@ -549,36 +549,84 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
-def main(argv: Optional[List[str]] = None) -> None:
-    args = parse_args(argv)
-    cities = resolve_cities(args.cities) or list(DEFAULT_CITIES)
-    domains = [d.strip() for d in args.domains.split(",") if d.strip()]
+def scrape(
+    *,
+    query: str = "рестораны",
+    cities: Optional[List[str]] = None,
+    max_results: int = 200,
+    proxy: str = "",
+    timeout: float = 30.0,
+    retries: int = 4,
+    sleep: float = 0.5,
+    keep_raw: bool = True,
+    domains: Optional[List[str]] = None,
+    out: Optional[str] = None,
+    formats: str = "csv,json",
+    resume: bool = False,
+    write: Optional[bool] = None,
+) -> List[Dict[str, Any]]:
+    """Collect Yandex Maps places. Writes files only when ``out`` is set."""
+    from parser_toolkit.core.report import RunReport, persist_run
+    from parser_toolkit.core.resume import load_checkpoint
+
+    city_list = [c.strip() for c in (cities or []) if c and str(c).strip()] or list(DEFAULT_CITIES)
+    host_list = domains or list(DEFAULT_DOMAINS)
+    should_write = write if write is not None else bool(out)
+    report = RunReport(source="yandex-maps")
 
     print("Yandex Maps parser — Direct HTTP / embedded JSON (no Apify)")
-    print(f"query={args.query!r} cities={cities} max/city={args.max}")
-    if args.proxy:
-        print(f"proxy={args.proxy.split('@')[-1] if '@' in args.proxy else args.proxy}")
+    print(f"query={query!r} cities={city_list} max/city={max_results}")
+    if proxy:
+        print(f"proxy={proxy.split('@')[-1] if '@' in proxy else proxy}")
 
     client = HttpClient(
-        timeout=args.timeout,
-        retries=args.retries,
-        proxy=args.proxy,
-        sleep_base=max(args.sleep, 0.3),
+        timeout=timeout,
+        retries=retries,
+        proxy=proxy,
+        sleep_base=max(sleep, 0.3),
     )
-    domain = pick_domain(client, domains)
+    domain = pick_domain(client, host_list)
 
-    # Dedup across cities by phone
     by_phone: Dict[str, Place] = {}
-    for city in cities:
+    if resume and out:
+        existing = load_checkpoint(out)
+        report.resumed = True
+        report.resumed_from = 0
+        for row in existing:
+            phone = row.get("phone")
+            if not phone or phone in by_phone:
+                continue
+            by_phone[phone] = Place(
+                source=row.get("source") or "yandex-maps",
+                name=row.get("name") or row.get("title") or "",
+                category=row.get("category") or "",
+                phones=list(row.get("phones") or ([phone] if phone else [])),
+                address=row.get("address") or "",
+                city=row.get("city") or "",
+                latitude=row.get("latitude") or "",
+                longitude=row.get("longitude") or "",
+                rating=row.get("rating") or "",
+                reviews_count=row.get("reviews_count") or "",
+                website=row.get("website") or "",
+                url=row.get("url") or "",
+                phone=phone,
+                phone2=row.get("phone2") or "",
+                place_id=row.get("place_id") or row.get("id") or "",
+            ).finalize()
+            report.resumed_from += 1
+        if report.resumed_from:
+            print(f"resume: loaded {report.resumed_from} existing phones from {out}.*")
+
+    for city in city_list:
         print(f"[{city}] …")
         found = search_city(
             client,
             domain=domain,
             city=city,
-            query=args.query,
-            max_results=args.max,
-            sleep=args.sleep,
-            keep_raw=args.keep_raw,
+            query=query,
+            max_results=max_results,
+            sleep=sleep,
+            keep_raw=keep_raw,
         )
         new = 0
         for place in found:
@@ -587,10 +635,51 @@ def main(argv: Optional[List[str]] = None) -> None:
             by_phone[place.phone] = place
             new += 1
         print(f"[{city}] +{new} | total={len(by_phone)}")
-        dump_places(by_phone.values(), args.out, fields=CSV_FIELDS, keep_raw=args.keep_raw)
+        if should_write and out:
+            dump_places(
+                by_phone.values(),
+                out,
+                fields=CSV_FIELDS,
+                keep_raw=keep_raw,
+                formats=formats,
+                source="yandex-maps",
+            )
 
-    dump_places(by_phone.values(), args.out, fields=CSV_FIELDS, keep_raw=args.keep_raw)
-    print(f"\nDone: {len(by_phone)} unique phones -> {args.out}.csv / {args.out}.json")
+    records = [p.to_dict(keep_raw=keep_raw) for p in by_phone.values()]
+    if should_write and out:
+        persist_run(
+            records,
+            out,
+            fields=CSV_FIELDS,
+            formats=formats,
+            keep_raw=keep_raw,
+            source="yandex-maps",
+            report=report,
+        )
+    else:
+        report.finish(records=records)
+    return records
+
+
+def main(argv: Optional[List[str]] = None) -> None:
+    args = parse_args(argv)
+    cities = resolve_cities(args.cities) or list(DEFAULT_CITIES)
+    domains = [d.strip() for d in args.domains.split(",") if d.strip()]
+    scrape(
+        query=args.query,
+        cities=cities,
+        max_results=args.max,
+        proxy=args.proxy or "",
+        timeout=args.timeout,
+        retries=args.retries,
+        sleep=args.sleep,
+        keep_raw=args.keep_raw,
+        domains=domains,
+        out=args.out,
+        formats=getattr(args, "formats", "csv,json"),
+        resume=getattr(args, "resume", False),
+        write=True,
+    )
     return 0
 
 

@@ -56,9 +56,16 @@ playwright install chromium
 ```text
 pip install
   → one command (parser-toolkit / ptk / python -m parser_toolkit)
-  → CSV + JSON under output/
+  → CSV / JSON / JSONL under output/ + {out}.run.json
   → clear errors on stderr + non-zero exit codes
+  → parser-toolkit doctor
   → unit tests (fixtures only)
+```
+
+```bash
+parser-toolkit doctor
+parser-toolkit 2gis --query "кофейни" --city moscow --max 50 --format csv,json,jsonl
+parser-toolkit krisha --city almaty --max 20 --cookie-file ./krisha.cookie --resume
 ```
 
 ### 2GIS — Direct HTTP / Internal Catalog Web API
@@ -188,7 +195,7 @@ CSV is UTF-8 with BOM for Excel.
 |---|---|
 | 2GIS | no user API key (uses the web key exposed by the 2GIS frontend) |
 | Yandex Maps | no user API key (optional proxy if your IP is rate-limited) |
-| CIAN | Russian residential/mobile proxy |
+| CIAN | Russian residential/mobile proxy (**required** — parser exits `4` without it) |
 | Krisha.kz | no user API key; optional `KRISHA_COOKIE` for full phones |
 | Kolesa.kz | Playwright + Chromium; optional `KOLESA_COOKIE` for session-dependent phone flow |
 
@@ -216,10 +223,12 @@ CSV is UTF-8 with BOM for Excel.
 | `CIAN_PATH` | cian | CIAN section |
 | `TWOGIS_KEY` | 2gis | optional Catalog key override |
 | `YANDEX_DOMAINS` | yandex-maps | Maps host fallback list |
-| `KRISHA_COOKIE` / `--cookie` | krisha | browser session cookie for full phones |
+| `KRISHA_COOKIE` / `--cookie` / `--cookie-file` | krisha | browser session cookie for full phones |
 | `--deal` `--type` | krisha | e.g. `arenda` / `kvartiry` |
-| `KOLESA_COOKIE` / `--cookie` | kolesa | browser session cookie (recommended) |
+| `KOLESA_COOKIE` / `--cookie` / `--cookie-file` | kolesa | browser session cookie (recommended) |
 | `--no-phones` | kolesa | metadata only (phones required by default) |
+| `--format` / `FORMAT` | all | `csv,json` (default) or add `jsonl` |
+| `--resume` / `RESUME=1` | all | skip records already in `{out}.json` |
 
 ---
 
@@ -231,7 +240,16 @@ python -m unittest discover -s tests -v
 
 Tests use local fixtures only — they do **not** hit live sites.
 
-Errors from the CLI go to **stderr** with a non-zero exit code (`1` runtime, `2` bad args / missing deps, `130` interrupt). Unknown source names are rejected before any network call.
+Errors from the CLI go to **stderr** with a non-zero exit code (`1` runtime, `2` bad args / missing deps, `4` CIAN without proxy, `130` interrupt). Unknown source names are rejected before any network call.
+
+### Library API
+
+```python
+from parser_toolkit import scrape, sources
+
+rows = scrape("krisha", cities=["almaty"], max_per_city=10, skip_phones=True)
+# pass out="output/krisha" to also write CSV/JSON + .run.json
+```
 
 ---
 
@@ -248,7 +266,7 @@ Errors from the CLI go to **stderr** with a non-zero exit code (`1` runtime, `2`
 
 [MIT](LICENSE)
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes (`v0.1.0`).
+See [CHANGELOG.md](CHANGELOG.md) for release notes (`v0.2.0`).
 
 ---
 

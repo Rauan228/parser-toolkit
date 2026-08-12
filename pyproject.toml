@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "parser-toolkit"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local Direct HTTP parsers for popular CIS/RU platforms (2GIS, Yandex Maps, CIAN, Krisha, Kolesa)"
 readme = "README.md"
 license = { text = "MIT" }

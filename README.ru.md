@@ -52,9 +52,16 @@ playwright install chromium
 ```text
 pip install
   → одна команда (parser-toolkit / ptk / python -m parser_toolkit)
-  → CSV + JSON в output/
+  → CSV / JSON / JSONL в output/ + {out}.run.json
   → понятные ошибки в stderr + ненулевой exit code
+  → parser-toolkit doctor
   → unit-тесты (только фикстуры)
+```
+
+```bash
+parser-toolkit doctor
+parser-toolkit 2gis --query "кофейни" --city moscow --max 50 --format csv,json,jsonl
+parser-toolkit krisha --city almaty --max 20 --cookie-file ./krisha.cookie --resume
 ```
 
 ### 2ГИС
@@ -144,11 +151,18 @@ parser-toolkit --version
 python -m unittest discover -s tests -v
 ```
 
-Только фикстуры, без сетевых запросов. Ошибки CLI — в **stderr**, ненулевой exit code.
+Только фикстуры, без сетевых запросов. Ошибки CLI — в **stderr**, ненулевой exit code (`4` — CIAN без прокси).
+
+Библиотека:
+
+```python
+from parser_toolkit import scrape
+rows = scrape("krisha", cities=["almaty"], max_per_city=10, skip_phones=True)
+```
 
 ---
 
 ## 📄 Лицензия
 
 [MIT](LICENSE) — автор [@Rauan228](https://github.com/Rauan228).  
-Релизные заметки: [CHANGELOG.md](CHANGELOG.md) (`v0.1.0`).
+Релизные заметки: [CHANGELOG.md](CHANGELOG.md) (`v0.2.0`).

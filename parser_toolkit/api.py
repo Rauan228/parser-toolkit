@@ -22,6 +22,7 @@ ALIASES = {
     "yandex-realty": "yandex-realty",
     "realty": "yandex-realty",
     "yandex_realty": "yandex-realty",
+    "drom": "drom",
     "cian": "cian",
     "krisha": "krisha",
     "kolesa": "kolesa",
@@ -35,13 +36,14 @@ def sources() -> tuple:
 def _load() -> None:
     if _DISPATCH:
         return
-    from parser_toolkit.parsers import cian, kolesa, krisha, twogis, yandex_maps, yandex_realty
+    from parser_toolkit.parsers import cian, drom, kolesa, krisha, twogis, yandex_maps, yandex_realty
 
     _DISPATCH.update(
         {
             "2gis": twogis.scrape,
             "yandex-maps": yandex_maps.scrape,
             "yandex-realty": yandex_realty.scrape,
+            "drom": drom.scrape,
             "cian": cian.scrape,
             "krisha": krisha.scrape,
             "kolesa": kolesa.scrape,

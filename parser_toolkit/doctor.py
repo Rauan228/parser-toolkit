@@ -37,6 +37,7 @@ def _imports() -> Check:
     try:
         from parser_toolkit.parsers import (  # noqa: F401
             cian,
+            drom,
             kolesa,
             krisha,
             twogis,
@@ -45,7 +46,7 @@ def _imports() -> Check:
         )
     except Exception as e:  # noqa: BLE001
         return _fail("parsers", f"{type(e).__name__}: {e}")
-    return _ok("parsers", "2gis, yandex-maps, yandex-realty, cian, krisha, kolesa")
+    return _ok("parsers", "2gis, yandex-maps, yandex-realty, drom, cian, krisha, kolesa")
 
 
 def _playwright() -> Check:

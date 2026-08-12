@@ -8,6 +8,7 @@ SOURCES = (
     "2gis",
     "yandex-maps",
     "yandex-realty",
+    "drom",
     "cian",
     "krisha",
     "kolesa",

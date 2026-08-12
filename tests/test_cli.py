@@ -11,7 +11,7 @@ from parser_toolkit.cli import run
 class TestCLI(unittest.TestCase):
     def test_version(self):
         self.assertEqual(run(["--version"]), 0)
-        self.assertEqual(__version__, "0.3.0")
+        self.assertEqual(__version__, "0.4.0")
 
     def test_help(self):
         self.assertEqual(run(["--help"]), 0)

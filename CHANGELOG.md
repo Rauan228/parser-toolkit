@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0] — 2026-08-10
+
+### Added
+
+- **Drom.ru** (`parser-toolkit drom`) — RU used cars via `auto.drom.ru/{city}/all/` + `/pageN/`
+  - List JSON: `data-drom-module="bulls-list-auto"`
+  - Fields: title, price_rub, year, mileage, engine, fuel, transmission, drive, city, URL
+  - Phones: optional `--phones` hits `/api/sales/bulls/{id}/contacts` (usually `type=4` without session; no captcha solving)
+- HTTP client decodes `windows-1251` (Drom pages)
+
 ## [0.3.0] — 2026-08-10
 
 ### Added

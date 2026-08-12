@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import http.cookiejar
+import re
 import ssl
 import time
 import urllib.error
@@ -130,11 +131,49 @@ class HttpClient:
         req = urllib.request.Request(url, headers=h)
         try:
             with self._opener.open(req, timeout=self.timeout) as resp:
-                return resp.read().decode("utf-8", "ignore")
+                raw = resp.read()
+                ctype = ""
+                try:
+                    ctype = resp.headers.get("Content-Type", "") or ""
+                except Exception:
+                    ctype = ""
+                return decode_http_body(raw, ctype)
         except urllib.error.HTTPError as e:
             body = ""
             try:
-                body = e.read().decode("utf-8", "ignore")
+                raw = e.read()
+                ctype = ""
+                try:
+                    ctype = e.headers.get("Content-Type", "") or ""
+                except Exception:
+                    ctype = ""
+                body = decode_http_body(raw, ctype)
             except Exception:
                 pass
             raise HttpError(f"HTTP {e.code} for {url}", status=e.code, body=body) from e
+
+
+def decode_http_body(raw: bytes, content_type: str = "") -> str:
+    """Decode using Content-Type / meta charset (Drom is windows-1251)."""
+    if not raw:
+        return ""
+    candidates = []
+    m = re.search(r"charset\s*=\s*([^\s;]+)", content_type or "", re.I)
+    if m:
+        candidates.append(m.group(1).strip("\"'").lower())
+    head = raw[:2500].decode("ascii", "ignore")
+    m = re.search(r"charset\s*=\s*([^\s;\"']+)", head, re.I)
+    if m:
+        candidates.append(m.group(1).lower())
+    mapped = []
+    for enc in candidates:
+        enc = enc.replace("windows-1251", "cp1251").replace("utf8", "utf-8")
+        if enc and enc not in mapped:
+            mapped.append(enc)
+    mapped.extend(["utf-8", "cp1251"])
+    for enc in mapped:
+        try:
+            return raw.decode(enc)
+        except (LookupError, UnicodeDecodeError):
+            continue
+    return raw.decode("utf-8", "replace")

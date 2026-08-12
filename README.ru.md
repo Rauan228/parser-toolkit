@@ -4,7 +4,7 @@
 
 [English version →](README.md)
 
-**2ГИС**, **Яндекс.Карты**, **Яндекс Недвижимость**, **ЦИАН**, **Krisha.kz** и **Kolesa.kz**. Собирают объявления и данные организаций/листингов в чистые CSV + JSON.
+**2ГИС**, **Яндекс.Карты**, **Яндекс Недвижимость**, **Drom.ru**, **ЦИАН**, **Krisha.kz** и **Kolesa.kz**. Собирают объявления и данные организаций/листингов в чистые CSV + JSON.
 
 **Без Apify. Парсеры запускаются локально, в основном по прямому HTTP. Browser automation — только там, где источник этого требует.**
 
@@ -19,6 +19,7 @@
 | [`2gis/`](2gis/) | [2ГИС](https://2gis.ru) | любые категории бизнеса | Direct HTTP / Internal Catalog Web API | опционально | Not required |
 | [`yandex-maps/`](yandex-maps/) | [Яндекс.Карты](https://yandex.ru/maps) | любые категории бизнеса | Direct HTTP / Embedded JSON (search HTML) | опционально | Not required |
 | [`yandex-realty/`](yandex-realty/) | [Яндекс Недвижимость](https://yandex.ru/realty) | объявления РФ | Direct HTTP / `yandex.ru/realty` SERP JSON | опционально | Not required |
+| [`drom/`](drom/) | [Drom.ru](https://auto.drom.ru) | авто РФ | Direct HTTP / list JSON | опционально | Not required |
 | [`cian/`](cian/) | [ЦИАН](https://cian.ru) | любой раздел недвижимости | Direct HTTP / Embedded JSON | 🇷🇺 нужен RU-прокси | Not required |
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | недвижимость KZ | Direct HTTP / HTML list + `window.data` | опционально | Not required |
 | [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | авто KZ | Direct HTTP + Playwright (телефоны/reCAPTCHA) | опционально | Not required |
@@ -85,6 +86,14 @@ parser-toolkit yandex-realty --city moscow --deal snyat --type kvartira --max 30
 
 Метаданные (цена, адрес, комнаты, площадь, этаж, метро). Телефонов в публичной выдаче нет; `realty.yandex.ru` закрыт SmartCaptcha.
 
+### Drom.ru
+
+```bash
+parser-toolkit drom --city moscow --pages 2 --max 40
+```
+
+Метаданные с `auto.drom.ru/{city}/all/`. Телефоны — только с сессией (`--phones`); анонимно API отвечает `type=4`.
+
 ### ЦИАН
 
 ```bash
@@ -139,6 +148,7 @@ parser-toolkit --version
 | 2ГИС | без user API key (web-ключ frontend 2gis.ru) |
 | Яндекс.Карты | без user API key (при 429 — другой IP/прокси) |
 | Яндекс Недвижимость | без user API key; телефоны не в публичной выдаче |
+| Drom.ru | без user API key; телефоны обычно закрыты без сессии |
 | ЦИАН | RU residential/mobile proxy |
 | Krisha.kz | без user API key; опционально `KRISHA_COOKIE` для полных телефонов |
 | Kolesa.kz | Playwright + Chromium; опционально `KOLESA_COOKIE` для session-зависимого phone flow |
@@ -150,6 +160,7 @@ parser-toolkit --version
 - **2ГИС** — Internal Catalog Web API (`catalog.api.2gis.ru/3.0/items`); в протоколе используется web-ключ frontend 2gis.ru, отдельный user API key выдавать не нужно.
 - **Яндекс.Карты** — публичные HTML-страницы поиска + embedded JSON (`stack[0].results.items[]`), пагинация `?page=N`. Fallback доменов при `429 limited`.
 - **Яндекс Недвижимость** — `yandex.ru/realty/{city}/{deal}/{type}/`, карточки `{"type":"offer"}`. `realty.yandex.ru` закрыт SmartCaptcha.
+- **Drom** — `auto.drom.ru/{city}/all/` + `/pageN/`, JSON `bulls-list-auto`. Contacts API без логина — `type=4`.
 - **ЦИАН** — embedded `"offers":[…]` в HTML выдачи.
 - **Krisha** — list HTML + detail `window.data`; телефоны через `/a/ajaxPhones` (нужна cookie сессии, если Krisha требует логин).
 - **Kolesa** — list/detail по HTTP; телефоны через Playwright + `app.kolesa.kz/adverts/{id}/phones` (reCAPTCHA v3 в браузере).
@@ -176,4 +187,4 @@ rows = scrape("krisha", cities=["almaty"], max_per_city=10, skip_phones=True)
 ## 📄 Лицензия
 
 [MIT](LICENSE) — автор [@Rauan228](https://github.com/Rauan228).  
-Релизные заметки: [CHANGELOG.md](CHANGELOG.md) (`v0.3.0`).
+Релизные заметки: [CHANGELOG.md](CHANGELOG.md) (`v0.4.0`).

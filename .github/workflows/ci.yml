@@ -27,4 +27,5 @@ jobs:
           python -m parser_toolkit doctor
           python -m parser_toolkit 2gis --help
           python -m parser_toolkit yandex-realty --help
+          python -m parser_toolkit drom --help
           python -m parser_toolkit cian --help

@@ -113,7 +113,7 @@ class TestCookiesAndResume(unittest.TestCase):
 
 class TestDoctorAndCli(unittest.TestCase):
     def test_version(self):
-        self.assertEqual(__version__, "0.3.0")
+        self.assertEqual(__version__, "0.4.0")
         self.assertEqual(run(["--version"]), 0)
 
     def test_doctor_offline(self):

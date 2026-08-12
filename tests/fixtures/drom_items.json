@@ -1,0 +1,40 @@
+[
+  {
+    "bullId": 784975014,
+    "price": 1350000,
+    "url": "https://auto.drom.ru/moscow/mercedes-benz/s-class/784975014.html",
+    "title": "Mercedes-Benz S-Class, 2001",
+    "subtitle": "S 600 AT L",
+    "location": "Москва",
+    "date": "сегодня",
+    "dealType": 6,
+    "dealerName": "",
+    "hasDealerName": false,
+    "sold": false,
+    "attributes": [
+      {"type": "plain", "payload": "5.8 л (367 л.с.)"},
+      {"type": "plain", "payload": "бензин"},
+      {"type": "plain", "payload": "АКПП"},
+      {"type": "plain", "payload": "задний"},
+      {"type": "plain", "payload": "132 000 км"}
+    ]
+  },
+  {
+    "bullId": 501174232,
+    "price": 2890000,
+    "url": "https://auto.drom.ru/moscow/lexus/nx200/501174232.html",
+    "title": "Lexus NX200, 2019",
+    "subtitle": "",
+    "location": "Москва",
+    "date": "сегодня",
+    "dealType": 6,
+    "sold": false,
+    "attributes": [
+      {"type": "plain", "payload": "2.0 л (150 л.с.)"},
+      {"type": "plain", "payload": "бензин"},
+      {"type": "plain", "payload": "вариатор"},
+      {"type": "plain", "payload": "полный"},
+      {"type": "plain", "payload": "78 000 км"}
+    ]
+  }
+]

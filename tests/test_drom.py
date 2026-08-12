@@ -67,10 +67,22 @@ class TestNormalize(unittest.TestCase):
         self.assertEqual(status, "blocked")
         self.assertEqual(phones, [])
 
+    def test_contacts_auth_required(self):
+        body = '{"type":5,"contactErrorNotification":{"type":10,"loginUrl":"https://my.drom.ru/sign"}}'
+        phones, status = drom_mod.parse_contacts_response(body)
+        self.assertEqual(status, "auth_required")
+        self.assertEqual(phones, [])
+
     def test_contacts_ok(self):
         phones, status = drom_mod.parse_contacts_response('{"phone":"+7 999 111-22-33"}')
         self.assertEqual(status, "ok")
         self.assertEqual(phones, ["+79991112233"])
+
+    def test_contacts_type9_html(self):
+        body = '{"type":9,"phone":"<span>+7 (915) 385-2795</span> <small>x</small>"}'
+        phones, status = drom_mod.parse_contacts_response(body)
+        self.assertEqual(status, "ok")
+        self.assertEqual(phones, ["+79153852795"])
 
 
 class TestDecode(unittest.TestCase):

@@ -33,7 +33,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 
-from parser_toolkit.core.cli import add_output_args, resolve_cities
+from parser_toolkit.core.cli import add_cookie_args, add_output_args, resolve_cities
 from parser_toolkit.core.http import HttpClient, HttpError
 from parser_toolkit.core.models import normalize_phone
 
@@ -308,14 +308,18 @@ def parse_contacts_response(body: str) -> Tuple[List[str], str]:
         return [], "error"
     if not isinstance(data, dict):
         return [], "error"
-    # type 4 = no access / captcha / session required (observed)
+    # type 4 = bad/incomplete request; type 5 + loginUrl = auth required
+    # type 9 = success (phone is often an HTML snippet)
     if data.get("type") == 4:
         return [], "blocked"
+    err = data.get("contactErrorNotification")
+    if isinstance(err, dict) and (err.get("loginUrl") or data.get("type") == 5):
+        return [], "auth_required"
     phones: List[str] = []
     for key in ("phone", "phones", "number", "numbers", "value"):
         val = data.get(key)
         if isinstance(val, str):
-            n = normalize_phone(val)
+            n = normalize_phone(re.sub(r"<[^>]+>", " ", val))
             if n:
                 phones.append(n)
         elif isinstance(val, list):
@@ -347,7 +351,12 @@ def parse_contacts_response(body: str) -> Tuple[List[str], str]:
     return uniq, ("ok" if uniq else "empty")
 
 
-def fetch_phones(client: HttpClient, detail: Dict[str, Any]) -> Tuple[List[str], str]:
+def fetch_phones(
+    client: HttpClient,
+    detail: Dict[str, Any],
+    *,
+    referer: str = "",
+) -> Tuple[List[str], str]:
     contact = detail.get("contact") or {}
     if not isinstance(contact, dict):
         return [], "empty"
@@ -357,14 +366,25 @@ def fetch_phones(client: HttpClient, detail: Dict[str, Any]) -> Tuple[List[str],
     )
     if not base:
         return [], "empty"
-    token = contact.get("contactToken") or ""
+    # Browser click on [data-ftid=open-contacts] uses:
+    #   contactData, regionIp, token, dust
+    token = contact.get("contactToken") or contact.get("token") or ""
     cdata = contact.get("contactData") or ""
-    url = base + "?" + urlencode({"contactToken": token, "contactData": cdata})
+    region_ip = contact.get("regionIp") or ""
+    query = {
+        "contactData": cdata,
+        "token": token,
+        "dust": "VGQBwPQs",
+    }
+    if region_ip not in (None, ""):
+        query["regionIp"] = str(region_ip)
+    url = base + "?" + urlencode(query)
     try:
         body = client.get(
             url,
-            accept="application/json",
-            referer=ORIGIN + "/",
+            accept="application/json,text/javascript,*/*;q=0.01",
+            referer=referer or ORIGIN + "/",
+            headers={"X-Requested-With": "XMLHttpRequest"},
         )
     except HttpError:
         return [], "error"
@@ -390,10 +410,15 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     p.add_argument("--timeout", type=float, default=float(os.environ.get("TIMEOUT", "30")))
     p.add_argument("--retries", type=int, default=int(os.environ.get("RETRIES", "4")))
     p.add_argument("--sleep", type=float, default=float(os.environ.get("SLEEP", "0.5")))
+    add_cookie_args(
+        p,
+        env_name="DROM_COOKIE",
+        help_cookie="logged-in Drom Cookie header (required for phones)",
+    )
     p.add_argument(
         "--phones",
         action="store_true",
-        help="fetch detail + contacts API (usually blocked without a Drom session)",
+        help="fetch detail + contacts API (needs DROM_COOKIE / --cookie-file)",
     )
     p.add_argument("--raw", dest="keep_raw", action="store_true", default=True)
     p.add_argument("--no-raw", dest="keep_raw", action="store_false")
@@ -412,27 +437,40 @@ def scrape(
     sleep: float = 0.5,
     keep_raw: bool = True,
     want_phones: bool = False,
+    cookie: str = "",
+    cookie_file: str = "",
     out: Optional[str] = None,
     formats: str = "csv,json",
     resume: bool = False,
     write: Optional[bool] = None,
 ) -> List[Dict[str, Any]]:
     """Collect Drom listings. Writes files only when ``out`` is set."""
+    from parser_toolkit.core.cookies import cookie_status, load_cookie
     from parser_toolkit.core.report import RunReport, persist_run
     from parser_toolkit.core.resume import load_checkpoint, seed_rows
     from parser_toolkit.core.schema import phone_metrics
 
     city_list = resolve_cities(cities) or list(DEFAULT_CITIES)
+    cookie = load_cookie(cookie=cookie, cookie_file=cookie_file, env_names=("DROM_COOKIE",))
     should_write = write if write is not None else bool(out)
     report = RunReport(source=SOURCE)
     report.extra["phones"] = "contacts_api" if want_phones else "skipped"
+    report.extra["cookie"] = cookie_status(cookie)
 
     print("Drom.ru parser — auto.drom.ru list JSON (Direct HTTP)")
     print(f"cities={city_list} pages={pages} max/city={max_per_city}")
     if want_phones:
-        print("phones: ON (detail + /api/sales/bulls/{id}/contacts; often type=4 without session)")
+        print(
+            "phones: ON (click-equivalent GET /contacts?contactData&token&regionIp)"
+            f" cookie={cookie_status(cookie)}"
+        )
+        if not cookie:
+            print(
+                "  NOTE: Drom returns type=5 / loginUrl without a logged-in session.\n"
+                "  Export Cookie from my.drom.ru after sign-in → DROM_COOKIE or --cookie-file"
+            )
     else:
-        print("phones: OFF (default; pass --phones to try contacts API)")
+        print("phones: OFF (default; pass --phones + DROM_COOKIE for numbers)")
     if proxy:
         print(f"proxy={proxy.split('@')[-1] if '@' in proxy else proxy}")
 
@@ -441,6 +479,7 @@ def scrape(
         retries=retries,
         proxy=proxy,
         sleep_base=max(sleep, 0.2),
+        cookie=cookie,
     )
 
     rows: Dict[str, Dict[str, Any]] = {}
@@ -483,10 +522,12 @@ def scrape(
                         try:
                             dhtml = client.get(detail_url, referer=url)
                             detail = extract_detail_module(dhtml) or {}
-                            phone_list, status = fetch_phones(client, detail)
+                            phone_list, status = fetch_phones(
+                                client, detail, referer=detail_url
+                            )
                             if status == "ok" and phone_list:
                                 phones_ok += 1
-                            elif status == "blocked":
+                            elif status in ("blocked", "auth_required"):
                                 phones_blocked += 1
                         except HttpError as e:
                             report.add_error(f"detail {lid}: {e}")
@@ -555,6 +596,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         sleep=args.sleep,
         keep_raw=args.keep_raw,
         want_phones=bool(args.phones),
+        cookie=getattr(args, "cookie", "") or "",
+        cookie_file=getattr(args, "cookie_file", "") or "",
         out=args.out,
         formats=getattr(args, "formats", "csv,json"),
         resume=getattr(args, "resume", False),

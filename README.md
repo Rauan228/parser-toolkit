@@ -4,7 +4,7 @@
 
 [Русская версия →](README.ru.md)
 
-Covers **2GIS**, **Yandex Maps**, **CIAN**, **Krisha.kz** and **Kolesa.kz**. Pull listings and business data into clean CSV + JSON. You decide what to collect.
+Covers **2GIS**, **Yandex Maps**, **Yandex Realty**, **CIAN**, **Krisha.kz** and **Kolesa.kz**. Pull listings and business data into clean CSV + JSON. You decide what to collect.
 
 Directory parsers (2GIS / Yandex) collect **public business phones**. Real-estate / marketplace parsers collect listing metadata; phone rules depend on the site (CIAN phones are open in page state; Krisha needs a logged-in cookie; Kolesa needs Playwright for the reCAPTCHA phone flow — see below).
 
@@ -20,6 +20,7 @@ Currently implemented with Python stdlib + optional Playwright for Kolesa phone 
 |---|---|---|---|---|---|
 | [`2gis/`](2gis/) | [2GIS](https://2gis.ru) | any business category | Direct HTTP / Internal Catalog Web API | optional | Not required |
 | [`yandex-maps/`](yandex-maps/) | [Yandex Maps](https://yandex.ru/maps) | any business category | Direct HTTP / Embedded JSON (search HTML) | optional | Not required |
+| [`yandex-realty/`](yandex-realty/) | [Yandex Realty](https://yandex.ru/realty) | RU real-estate listings | Direct HTTP / `yandex.ru/realty` SERP JSON | optional | Not required |
 | [`cian/`](cian/) | [CIAN](https://cian.ru) | any real-estate section | Direct HTTP / Embedded JSON | 🇷🇺 RU proxy required | Not required |
 | [`krisha/`](krisha/) | [Krisha.kz](https://krisha.kz) | any real-estate section (KZ) | Direct HTTP / HTML list + `window.data` | optional | Not required |
 | [`kolesa/`](kolesa/) | [Kolesa.kz](https://kolesa.kz) | auto listings (KZ) | Direct HTTP + Playwright (phones/reCAPTCHA) | optional | Not required |
@@ -27,7 +28,7 @@ Currently implemented with Python stdlib + optional Playwright for Kolesa phone 
 Installable Python package (`parser_toolkit`) with a single CLI. Shared helpers: HTTP client, place model, CSV/JSON writers. Thin shims under `2gis/`, `yandex-maps/`, … still work for the old `python path/to_parser.py` style.
 
 - **2GIS / Yandex Maps** — business directories: any query + list of cities.
-- **CIAN / Krisha** — real estate listings (RU / KZ).
+- **Yandex Realty / CIAN / Krisha** — real estate listings (RU / KZ). Realty phones are **not** in the public SERP (`realty.yandex.ru` is captcha-walled).
 - **2GIS** uses the web key exposed by the 2GIS frontend; no user-provided API key is required.
 - **Krisha** full phones need an optional logged-in browser cookie (`KRISHA_COOKIE`); metadata works without it.
 - **Kolesa** phones need Playwright (reCAPTCHA v3 runs in a real browser click flow); optional `KOLESA_COOKIE`.
@@ -82,6 +83,15 @@ QUERY="кофейни" CITIES="moscow,spb" parser-toolkit 2gis
 parser-toolkit yandex-maps --query "стоматология" --city "Астана" --max 50
 QUERY="барбершоп" CITIES="Москва,Сочи" parser-toolkit yandex-maps
 ```
+
+### Yandex Realty — `yandex.ru/realty` (phones not public)
+
+```bash
+parser-toolkit yandex-realty --city moscow --deal snyat --type kvartira --max 30
+parser-toolkit yandex-realty --city spb --deal kupit --pages 2
+```
+
+Collects price, address, rooms, area, floor, metro, geo. `realty.yandex.ru` itself returns SmartCaptcha — we do not solve it.
 
 ### CIAN — Direct HTTP / Embedded JSON (RU proxy)
 
@@ -195,6 +205,7 @@ CSV is UTF-8 with BOM for Excel.
 |---|---|
 | 2GIS | no user API key (uses the web key exposed by the 2GIS frontend) |
 | Yandex Maps | no user API key (optional proxy if your IP is rate-limited) |
+| Yandex Realty | no user API key; phones not public (SERP metadata only) |
 | CIAN | Russian residential/mobile proxy (**required** — parser exits `4` without it) |
 | Krisha.kz | no user API key; optional `KRISHA_COOKIE` for full phones |
 | Kolesa.kz | Playwright + Chromium; optional `KOLESA_COOKIE` for session-dependent phone flow |
@@ -205,6 +216,7 @@ CSV is UTF-8 with BOM for Excel.
 
 - **2GIS** — `catalog.api.2gis.ru/3.0/items` (+ `region/list`) with the site’s `webApiOutsourceKey`; paginates and maps `contact_groups` → phones/website/email.
 - **Yandex Maps** — fetches public search HTML and parses the SPA hydration JSON at `stack[0].results.items[]`; paginates with `?page=N`. Domain fallback (`yandex.ru` → `yandex.kz` → …) if a host returns `429 limited`.
+- **Yandex Realty** — `yandex.ru/realty/{city}/{deal}/{type}/` SERP; offer cards as embedded `{"type":"offer"}` JSON. `realty.yandex.ru` is captcha-walled.
 - **CIAN** — slices the balanced `"offers":[…]` array from server-rendered page state.
 - **Krisha** — list HTML (`data-product-id`) + detail `window.data`; phones via `/a/ajaxPhones?id=` (login session cookie when Krisha requires auth).
 - **Kolesa** — list/detail over HTTP; phones via Playwright intercept of `app.kolesa.kz/adverts/{id}/phones` (reCAPTCHA v3 in browser).
@@ -266,7 +278,7 @@ rows = scrape("krisha", cities=["almaty"], max_per_city=10, skip_phones=True)
 
 [MIT](LICENSE)
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes (`v0.2.0`).
+See [CHANGELOG.md](CHANGELOG.md) for release notes (`v0.3.0`).
 
 ---
 

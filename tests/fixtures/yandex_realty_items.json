@@ -1,0 +1,306 @@
+[
+  {
+    "id": "8051294829830356491",
+    "type": "offer",
+    "title": "126 500 ₽ в месяц",
+    "locationType": "metro",
+    "metro": {
+      "id": "geo20503",
+      "name": "Пролетарская",
+      "lineName": "Таганско-Краснопресненская линия",
+      "time": {
+        "type": "foot",
+        "value": 4
+      },
+      "colors": [
+        "#b1179a"
+      ],
+      "isExpected": false,
+      "geoPoint": {
+        "latitude": 55.7319,
+        "longitude": 37.6661
+      }
+    },
+    "address": "Москва, Марксистская улица, 9",
+    "url": "https://yandex.ru/realty/offer/8051294829830356491",
+    "specs": {
+      "primarySpecs": [
+        {
+          "key": "roomCountTypeShort",
+          "children": "3-комн."
+        },
+        {
+          "key": "apartmentArea",
+          "children": "67,4 м²"
+        },
+        {
+          "key": "floorOutOfTotal",
+          "children": "15/17 этаж"
+        }
+      ]
+    },
+    "logNodeAttrs": {
+      "offer-id": "8051294829830356491",
+      "cluster-id": "8051294829830356491",
+      "offer-type": "RENT",
+      "sale-type": "SECONDARY",
+      "category-type": "APARTMENT",
+      "price": 126500,
+      "geobase_id": "213",
+      "apartment_area_sq_m": "67.4",
+      "address": "Москва, Марксистская улица, 9",
+      "main-classified-name": "Я.Недвижимость"
+    },
+    "favoritesButtonProps": {
+      "requestParams": {
+        "theme": "realty",
+        "docId": "8051294829830356491",
+        "docType": "apartment"
+      },
+      "isLiked": false,
+      "cSRFToken": "",
+      "showFavoritesLink": true,
+      "view": "inline"
+    },
+    "isTesting": false,
+    "sourceInfos": {
+      "extraCount": 0,
+      "favicons": [
+        {
+          "url": "https://yastatic.net/s3/metarealty/agency_logo/realty_32.svg"
+        }
+      ],
+      "text": "Я.Недвижимость"
+    },
+    "source": "listing",
+    "feedbackButtonProps": {
+      "items": [
+        {
+          "id": "SOURCE_OFFER_EXPIRED",
+          "title": "Объявление снято с публикации",
+          "comment": "https://realty.yandex.ru/offer/4040702871715238187/"
+        },
+        {
+          "id": "WRONG_PRICE",
+          "title": "Неверная цена объекта"
+        },
+        {
+          "id": "WRONG_ADDRESS",
+          "title": "Адрес указан неверно"
+        },
+        {
+          "id": "WRONG_CATEGORY",
+          "title": "Ошибка в типе объекта"
+        },
+        {
+          "id": "WRONG_AD_PARAMETERS",
+          "title": "Неверные данные объекта"
+        },
+        {
+          "id": "WRONG_PHOTO",
+          "title": "Плохие фотографии"
+        },
+        {
+          "id": "SOLD",
+          "title": "Продано или сдано"
+        },
+        {
+          "id": "ANOTHER",
+          "title": "Другое",
+          "needDescription": true,
+          "minLengthValue": 10
+        }
+      ],
+      "requestParams": {
+        "offerId": "8051294829830356491",
+        "feedId": "46",
+        "application": "WEB",
+        "placement": "Карточка объявления"
+      }
+    },
+    "mediaCarouselProps": {
+      "imageWidth": "100%",
+      "imageHeight": "100%",
+      "items": [
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/16303815/c629e4a2-7b92-40fd-bd9c-49bc02ba301a/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/14783890/06376228-41ce-4d8a-a044-553ff97813a2/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/16147544/4b141364-d56b-48cc-972a-f0179e703945/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/16397297/4dac4105-a0d3-462b-a3cc-0484a904bfbe/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/15030428/ec0053ee-5ef6-4f0d-bce4-e4832439813d/M_height",
+          "type": "image"
+        }
+      ],
+      "moreItemsProps": {
+        "text": "ещё 12 фото"
+      }
+    },
+    "action": {
+      "type": "learnMore"
+    }
+  },
+  {
+    "id": "4314821686868628200",
+    "type": "offer",
+    "title": "117 500 ₽ в месяц",
+    "locationType": "metro",
+    "metro": {
+      "id": "geo20563",
+      "name": "Достоевская",
+      "lineName": "Люблинско-Дмитровская линия",
+      "time": {
+        "type": "foot",
+        "value": 5
+      },
+      "colors": [
+        "#69cd37"
+      ],
+      "isExpected": false,
+      "geoPoint": {
+        "latitude": 55.7815,
+        "longitude": 37.6147
+      }
+    },
+    "address": "Москва, 1-й Самотёчный переулок, 22",
+    "url": "https://yandex.ru/realty/offer/4314821686868628200",
+    "specs": {
+      "primarySpecs": [
+        {
+          "key": "roomCountTypeShort",
+          "children": "2-комн."
+        },
+        {
+          "key": "apartmentArea",
+          "children": "55 м²"
+        },
+        {
+          "key": "floorOutOfTotal",
+          "children": "6/8 этаж"
+        }
+      ]
+    },
+    "logNodeAttrs": {
+      "offer-id": "4314821686868628200",
+      "cluster-id": "4314821686868628200",
+      "offer-type": "RENT",
+      "sale-type": "SECONDARY",
+      "category-type": "APARTMENT",
+      "price": 117500,
+      "geobase_id": "213",
+      "apartment_area_sq_m": "55",
+      "address": "Москва, 1-й Самотёчный переулок, 22",
+      "main-classified-name": "Я.Недвижимость"
+    },
+    "favoritesButtonProps": {
+      "requestParams": {
+        "theme": "realty",
+        "docId": "4314821686868628200",
+        "docType": "apartment"
+      },
+      "isLiked": false,
+      "cSRFToken": "",
+      "showFavoritesLink": true,
+      "view": "inline"
+    },
+    "isTesting": false,
+    "sourceInfos": {
+      "extraCount": 0,
+      "favicons": [
+        {
+          "url": "https://yastatic.net/s3/metarealty/agency_logo/realty_32.svg"
+        }
+      ],
+      "text": "Я.Недвижимость"
+    },
+    "source": "listing",
+    "feedbackButtonProps": {
+      "items": [
+        {
+          "id": "SOURCE_OFFER_EXPIRED",
+          "title": "Объявление снято с публикации",
+          "comment": "https://realty.yandex.ru/offer/1144809122110912879/"
+        },
+        {
+          "id": "WRONG_PRICE",
+          "title": "Неверная цена объекта"
+        },
+        {
+          "id": "WRONG_ADDRESS",
+          "title": "Адрес указан неверно"
+        },
+        {
+          "id": "WRONG_CATEGORY",
+          "title": "Ошибка в типе объекта"
+        },
+        {
+          "id": "WRONG_AD_PARAMETERS",
+          "title": "Неверные данные объекта"
+        },
+        {
+          "id": "WRONG_PHOTO",
+          "title": "Плохие фотографии"
+        },
+        {
+          "id": "SOLD",
+          "title": "Продано или сдано"
+        },
+        {
+          "id": "ANOTHER",
+          "title": "Другое",
+          "needDescription": true,
+          "minLengthValue": 10
+        }
+      ],
+      "requestParams": {
+        "offerId": "4314821686868628200",
+        "feedId": "46",
+        "application": "WEB",
+        "placement": "Карточка объявления"
+      }
+    },
+    "mediaCarouselProps": {
+      "imageWidth": "100%",
+      "imageHeight": "100%",
+      "items": [
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/16133223/6c49ec13-fe32-4c2d-9c0b-5247e07e85d3/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/15147277/07a80760-8aae-4832-a6ea-9a2e7d5b69b3/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/16093548/ebf50f97-97ba-403f-a231-98ffbe86461c/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/14533919/ab64df4c-811b-4a96-92f8-9ead068979f1/M_height",
+          "type": "image"
+        },
+        {
+          "src": "https://avatars.mds.yandex.net/get-metarealty/14885776/7fc97024-ceda-4218-b1ca-e61be233d5e2/M_height",
+          "type": "image"
+        }
+      ],
+      "moreItemsProps": {
+        "text": "ещё 21 фото"
+      }
+    },
+    "action": {
+      "type": "learnMore"
+    }
+  }
+]

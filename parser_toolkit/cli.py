@@ -14,6 +14,9 @@ ALIASES = {
     "twogis": "2gis",
     "yandex-maps": "yandex-maps",
     "yandex": "yandex-maps",
+    "yandex-realty": "yandex-realty",
+    "realty": "yandex-realty",
+    "yandex_realty": "yandex-realty",
     "cian": "cian",
     "krisha": "krisha",
     "kolesa": "kolesa",
@@ -28,11 +31,13 @@ def _register() -> None:
     from parser_toolkit.parsers import krisha as krisha_mod
     from parser_toolkit.parsers import twogis as twogis_mod
     from parser_toolkit.parsers import yandex_maps as yandex_mod
+    from parser_toolkit.parsers import yandex_realty as yandex_realty_mod
 
     _RUNNERS.update(
         {
             "2gis": twogis_mod.main,
             "yandex-maps": yandex_mod.main,
+            "yandex-realty": yandex_realty_mod.main,
             "cian": cian_mod.main,
             "krisha": krisha_mod.main,
             "kolesa": kolesa_mod.main,
@@ -74,6 +79,7 @@ usage:
 sources:
   2gis           2GIS businesses (Catalog web API)
   yandex-maps    Yandex Maps businesses (embedded JSON)
+  yandex-realty  Yandex Realty listings (yandex.ru/realty; phones not public)
   cian           CIAN real estate (embedded JSON, RU proxy required)
   krisha         Krisha.kz real estate (window.data + cookie phones)
   kolesa         Kolesa.kz autos (HTTP + Playwright phones)
@@ -88,6 +94,7 @@ examples:
   parser-toolkit doctor
   parser-toolkit 2gis --query "кофейни" --city moscow --max 50
   parser-toolkit yandex-maps --query "стоматология" --city "Астана"
+  parser-toolkit yandex-realty --city moscow --deal snyat --max 30
   parser-toolkit cian --proxy http://user:pass@host:port --pages 3
   parser-toolkit krisha --city almaty --max 30 --cookie-file ./krisha.cookie
   KOLESA_COOKIE="…" parser-toolkit kolesa --city almaty --max 15

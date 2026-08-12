@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0] — 2026-08-10
+
+### Added
+
+- **Yandex Realty** (`parser-toolkit yandex-realty` / `realty`)
+  - Source: `yandex.ru/realty/{city}/{deal}/{type}/` (Yandex Search vertical)
+  - Fields: price, address, rooms, area, floor, metro, geo, URL
+  - Honest phones: **not public** on SERP; `realty.yandex.ru` is SmartCaptcha-walled (exit `4` if all hosts captcha)
+  - `--pages` = extra views (sort variants + text search), not `?page=N`
+
 ## [0.2.0] — 2026-08-10
 
 Hardening of the five v0.1 parsers — no new sources.

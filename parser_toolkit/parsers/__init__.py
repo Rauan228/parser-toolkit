@@ -7,6 +7,7 @@ modules directly. Each module also exposes ``scrape(...)``.
 SOURCES = (
     "2gis",
     "yandex-maps",
+    "yandex-realty",
     "cian",
     "krisha",
     "kolesa",

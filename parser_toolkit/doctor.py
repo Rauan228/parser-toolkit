@@ -35,10 +35,17 @@ def _package() -> Check:
 
 def _imports() -> Check:
     try:
-        from parser_toolkit.parsers import cian, kolesa, krisha, twogis, yandex_maps  # noqa: F401
+        from parser_toolkit.parsers import (  # noqa: F401
+            cian,
+            kolesa,
+            krisha,
+            twogis,
+            yandex_maps,
+            yandex_realty,
+        )
     except Exception as e:  # noqa: BLE001
         return _fail("parsers", f"{type(e).__name__}: {e}")
-    return _ok("parsers", "2gis, yandex-maps, cian, krisha, kolesa")
+    return _ok("parsers", "2gis, yandex-maps, yandex-realty, cian, krisha, kolesa")
 
 
 def _playwright() -> Check:

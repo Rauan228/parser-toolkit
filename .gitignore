@@ -35,5 +35,6 @@ networklogs*.txt
 # local screenshots / probe artifacts
 image.png
 _probe_*.py
+_probe/
 _smoke_*.py
 _test_*.py

@@ -17,17 +17,20 @@ Data path
    → ``data-drom-module="bull-page"``
    → GET https://www.drom.ru/api/sales/bulls/{id}/contacts?contactToken=…
 
-   Without a logged-in session the contacts API returns ``{"type":4}``
-   (no number). We do not solve Drom captcha / reCAPTCHA.
+   Contacts need a logged-in session (``DROM_COOKIE``). Drom revokes the
+   session if many reveals fire in a burst — we pace requests (sleep +
+   jitter + batch pause) and stop phones on ``auth_required``.
 
 Usage:
     parser-toolkit drom --city moscow --pages 2 --max 40
+    parser-toolkit drom --city moscow --max 50 --phones --cookie-file drom.cookie --resume
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import random
 import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -391,6 +394,76 @@ def fetch_phones(
     return parse_contacts_response(body)
 
 
+def phone_delay(base: float, jitter: float, rng: Optional[random.Random] = None) -> float:
+    """Human-ish wait: base ± jitter fraction. Never below 1s when phones are on."""
+    base = max(float(base), 0.0)
+    jitter = min(max(float(jitter), 0.0), 0.95)
+    if base <= 0:
+        return 0.0
+    span = base * jitter
+    pick = (rng or random).uniform(base - span, base + span)
+    return max(1.0, pick)
+
+
+class PhoneGuard:
+    """Stop / cool down phone reveals so Drom does not kill the session."""
+
+    def __init__(
+        self,
+        *,
+        sleep: float = 8.0,
+        jitter: float = 0.35,
+        batch: int = 5,
+        batch_pause: float = 60.0,
+        phone_max: int = 0,
+        stop_on_auth: bool = True,
+        max_fail_streak: int = 3,
+    ) -> None:
+        self.sleep = sleep
+        self.jitter = jitter
+        self.batch = max(1, int(batch))
+        self.batch_pause = max(0.0, float(batch_pause))
+        self.phone_max = max(0, int(phone_max))
+        self.stop_on_auth = stop_on_auth
+        self.max_fail_streak = max(1, int(max_fail_streak))
+        self.ok = 0
+        self.fail_streak = 0
+        self.stopped = False
+        self.stop_reason = ""
+        self.attempts = 0
+
+    def allow(self) -> bool:
+        if self.stopped:
+            return False
+        if self.phone_max and self.ok >= self.phone_max:
+            self.stopped = True
+            self.stop_reason = f"phone-max {self.phone_max} reached"
+            return False
+        return True
+
+    def after(self, status: str) -> Optional[float]:
+        """Record result. Returns extra seconds to sleep (batch pause), or None."""
+        self.attempts += 1
+        if status == "ok":
+            self.ok += 1
+            self.fail_streak = 0
+            if self.phone_max and self.ok >= self.phone_max:
+                self.stopped = True
+                self.stop_reason = f"phone-max {self.phone_max} reached"
+            if self.ok > 0 and self.ok % self.batch == 0:
+                return self.batch_pause
+            return 0.0
+        if status == "auth_required" and self.stop_on_auth:
+            self.stopped = True
+            self.stop_reason = "Drom asked to log in again (session revoked)"
+            return None
+        self.fail_streak += 1
+        if self.fail_streak >= self.max_fail_streak:
+            self.stopped = True
+            self.stop_reason = f"{self.fail_streak} phone fails in a row — stopping reveals"
+        return 0.0
+
+
 def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Drom.ru auto listings (HTTP list JSON; phones need session, often blocked)",
@@ -420,6 +493,36 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="fetch detail + contacts API (needs DROM_COOKIE / --cookie-file)",
     )
+    p.add_argument(
+        "--phone-sleep",
+        type=float,
+        default=float(os.environ.get("PHONE_SLEEP", "8")),
+        help="seconds between phone reveals (default 8, plus jitter)",
+    )
+    p.add_argument(
+        "--phone-jitter",
+        type=float,
+        default=float(os.environ.get("PHONE_JITTER", "0.35")),
+        help="random ± fraction of --phone-sleep (default 0.35)",
+    )
+    p.add_argument(
+        "--phone-batch",
+        type=int,
+        default=int(os.environ.get("PHONE_BATCH", "5")),
+        help="after this many successful reveals, take a longer pause",
+    )
+    p.add_argument(
+        "--phone-batch-pause",
+        type=float,
+        default=float(os.environ.get("PHONE_BATCH_PAUSE", "75")),
+        help="seconds to wait after each successful batch (default 75)",
+    )
+    p.add_argument(
+        "--phone-max",
+        type=int,
+        default=int(os.environ.get("PHONE_MAX", "0")),
+        help="max successful phone reveals this run (0 = no extra cap)",
+    )
     p.add_argument("--raw", dest="keep_raw", action="store_true", default=True)
     p.add_argument("--no-raw", dest="keep_raw", action="store_false")
     add_output_args(p)
@@ -439,6 +542,11 @@ def scrape(
     want_phones: bool = False,
     cookie: str = "",
     cookie_file: str = "",
+    phone_sleep: float = 8.0,
+    phone_jitter: float = 0.35,
+    phone_batch: int = 5,
+    phone_batch_pause: float = 75.0,
+    phone_max: int = 0,
     out: Optional[str] = None,
     formats: str = "csv,json",
     resume: bool = False,
@@ -459,10 +567,19 @@ def scrape(
 
     print("Drom.ru parser — auto.drom.ru list JSON (Direct HTTP)")
     print(f"cities={city_list} pages={pages} max/city={max_per_city}")
+    guard = PhoneGuard(
+        sleep=phone_sleep,
+        jitter=phone_jitter,
+        batch=phone_batch,
+        batch_pause=phone_batch_pause,
+        phone_max=phone_max,
+    )
     if want_phones:
         print(
-            "phones: ON (click-equivalent GET /contacts?contactData&token&regionIp)"
-            f" cookie={cookie_status(cookie)}"
+            "phones: ON (contacts API) cookie="
+            f"{cookie_status(cookie)} sleep={phone_sleep}s±{int(phone_jitter*100)}% "
+            f"batch={phone_batch}/{phone_batch_pause}s"
+            + (f" max={phone_max}" if phone_max else "")
         )
         if not cookie:
             print(
@@ -513,25 +630,60 @@ def scrape(
             added = 0
             for bull in bulls:
                 lid = str(bull.get("bullId") or "")
-                if not lid or lid in rows:
+                if not lid:
                     continue
+                existing = rows.get(lid)
+                need_phone = want_phones and guard.allow() and not (
+                    existing and existing.get("phone")
+                )
                 phone_list: List[str] = []
-                if want_phones:
-                    detail_url = bull.get("url") or ""
+                if existing and not need_phone:
+                    continue
+                if need_phone:
+                    detail_url = (existing or bull).get("url") or bull.get("url") or ""
                     if detail_url:
                         try:
+                            wait = phone_delay(guard.sleep, guard.jitter)
+                            time.sleep(wait)
                             dhtml = client.get(detail_url, referer=url)
                             detail = extract_detail_module(dhtml) or {}
                             phone_list, status = fetch_phones(
                                 client, detail, referer=detail_url
                             )
+                            extra = guard.after(status)
                             if status == "ok" and phone_list:
                                 phones_ok += 1
-                            elif status in ("blocked", "auth_required"):
+                                print(f"    {lid}: phone ok ({phones_ok})")
+                            else:
                                 phones_blocked += 1
+                                print(f"    {lid}: phones {status}")
+                            if extra:
+                                print(f"    phone batch pause {extra:.0f}s …")
+                                time.sleep(extra)
+                            if guard.stopped:
+                                print(f"    phones stopped: {guard.stop_reason}")
+                                print("    metadata continues; later: fresh cookie + --resume")
                         except HttpError as e:
                             report.add_error(f"detail {lid}: {e}")
-                        time.sleep(sleep * 0.5)
+                            guard.after("error")
+                if existing:
+                    if phone_list:
+                        existing["phone"] = phone_list[0]
+                        existing["phones"] = phone_list
+                        if len(phone_list) > 1:
+                            existing["phone2"] = phone_list[1]
+                    if should_write and out and phone_list:
+                        persist_run(
+                            list(rows.values()),
+                            out,
+                            fields=CSV_FIELDS,
+                            formats=formats,
+                            keep_raw=keep_raw,
+                            source=SOURCE,
+                            report=report,
+                            echo=False,
+                        )
+                    continue
                 row = normalize_listing(
                     bull,
                     fallback_city=display,
@@ -541,6 +693,17 @@ def scrape(
                 rows[lid] = row
                 added += 1
                 city_new += 1
+                if should_write and out and phone_list:
+                    persist_run(
+                        list(rows.values()),
+                        out,
+                        fields=CSV_FIELDS,
+                        formats=formats,
+                        keep_raw=keep_raw,
+                        source=SOURCE,
+                        report=report,
+                        echo=False,
+                    )
                 if city_new >= max_per_city:
                     break
             print(f"    page {page}: +{added} (city={city_new} total={len(rows)})")
@@ -563,7 +726,14 @@ def scrape(
 
     records = list(rows.values())
     extra = phone_metrics(records)
-    extra.update({"phones_ok": phones_ok, "phones_blocked": phones_blocked})
+    extra.update(
+        {
+            "phones_ok": phones_ok,
+            "phones_blocked": phones_blocked,
+            "phones_stopped": guard.stopped,
+            "phones_stop_reason": guard.stop_reason,
+        }
+    )
     if should_write and out:
         persist_run(
             records,
@@ -598,6 +768,11 @@ def main(argv: Optional[List[str]] = None) -> None:
         want_phones=bool(args.phones),
         cookie=getattr(args, "cookie", "") or "",
         cookie_file=getattr(args, "cookie_file", "") or "",
+        phone_sleep=getattr(args, "phone_sleep", 8.0),
+        phone_jitter=getattr(args, "phone_jitter", 0.35),
+        phone_batch=getattr(args, "phone_batch", 5),
+        phone_batch_pause=getattr(args, "phone_batch_pause", 75.0),
+        phone_max=getattr(args, "phone_max", 0),
         out=args.out,
         formats=getattr(args, "formats", "csv,json"),
         resume=getattr(args, "resume", False),

@@ -12,13 +12,18 @@ No Apify. Direct HTTP. List page embeds JSON in
 
 Title, price (RUB), year, mileage, engine, fuel, transmission, drive, city, URL.
 
-**Phones** are behind `GET /api/sales/bulls/{id}/contacts`. Without a logged-in Drom session the API returns `{"type":4}` (no number). We do not solve captcha. Pass `--phones` only if you want to try the contacts call.
-
-## Usage
+**Phones** are behind `GET /api/sales/bulls/{id}/contacts` and need a logged-in cookie (`DROM_COOKIE` / `--cookie-file`). Drom kills the session if many reveals fire in a burst. The parser paces them (sleep + jitter + batch pause) and **stops phone calls** on `auth_required` so metadata is not wasted.
 
 ```bash
-parser-toolkit drom --city moscow --pages 2 --max 40
-parser-toolkit drom --city spb --city kazan --max 20
+# metadata only (fast)
+parser-toolkit drom --city moscow --pages 3 --max 50 --out output/drom_50
+
+# phones: slow, batched, resumable
+parser-toolkit drom --city moscow --max 50 --phones --resume \
+  --cookie-file drom.cookie --out output/drom_50 \
+  --phone-sleep 8 --phone-batch 5 --phone-batch-pause 75 --phone-max 15
 ```
+
+If Drom asks to log in again: export a fresh cookie, then the same command with `--resume` (already collected numbers are skipped).
 
 Pagination: `https://auto.drom.ru/{city}/all/` then `/page2/`, `/page3/`, …

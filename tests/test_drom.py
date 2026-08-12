@@ -103,6 +103,39 @@ class TestScrapeMocked(unittest.TestCase):
         self.assertEqual(rows[0]["source"], "drom")
 
 
+class TestPhoneGuard(unittest.TestCase):
+    def test_delay_bounds(self):
+        rng = __import__("random").Random(0)
+        for _ in range(20):
+            d = drom_mod.phone_delay(8, 0.35, rng)
+            self.assertGreaterEqual(d, 8 * 0.65)
+            self.assertLessEqual(d, 8 * 1.35)
+
+    def test_stops_on_auth(self):
+        g = drom_mod.PhoneGuard(batch=10, phone_max=0)
+        self.assertTrue(g.allow())
+        g.after("ok")
+        extra = g.after("auth_required")
+        self.assertIsNone(extra)
+        self.assertTrue(g.stopped)
+        self.assertFalse(g.allow())
+
+    def test_batch_pause_and_max(self):
+        g = drom_mod.PhoneGuard(batch=2, batch_pause=30, phone_max=3)
+        self.assertEqual(g.after("ok"), 0.0)
+        self.assertEqual(g.after("ok"), 30)
+        self.assertEqual(g.after("ok"), 0.0)
+        self.assertTrue(g.stopped)
+        self.assertFalse(g.allow())
+
+    def test_fail_streak(self):
+        g = drom_mod.PhoneGuard(max_fail_streak=2)
+        g.after("blocked")
+        self.assertFalse(g.stopped)
+        g.after("blocked")
+        self.assertTrue(g.stopped)
+
+
 class TestCli(unittest.TestCase):
     def test_help(self):
         self.assertEqual(run(["drom", "--help"]), 0)

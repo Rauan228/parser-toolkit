@@ -102,7 +102,7 @@ parser-toolkit drom --city moscow --pages 2 --max 40
 parser-toolkit drom --city spb --city kazan --max 20
 ```
 
-Metadata from `auto.drom.ru/{city}/all/` (and `/page2/`, …). Phones are **not** in the list; `--phones` tries the contacts API and usually gets `type=4` without a Drom login.
+Metadata from `auto.drom.ru/{city}/all/` (and `/page2/`, …). Phones need a logged-in cookie and are paced (`--phone-sleep` / `--phone-batch`) so Drom does not revoke the session. Use `--resume` after a fresh login.
 
 ### CIAN — Direct HTTP / Embedded JSON (RU proxy)
 

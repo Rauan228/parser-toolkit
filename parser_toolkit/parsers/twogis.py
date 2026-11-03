@@ -35,6 +35,9 @@ import urllib.parse
 import urllib.request
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from parser_toolkit.core.contacts import CONTACT_FIELDS, contact_summary, twogis_contacts
+from parser_toolkit.core.schema import record_id
+
 # --- config (env-overridable; CLI in main() can override module globals) -----
 OUT = os.environ.get("OUT", "output/twogis_places")
 MAX = int(os.environ.get("MAX", "500"))
@@ -115,7 +118,7 @@ FIELDS = [
     "rubric_ids",
     "schedule",
     "postcode",
-]
+] + CONTACT_FIELDS
 
 # --- helpers -----------------------------------------------------------------
 _ssl_ctx = ssl.create_default_context()
@@ -286,9 +289,12 @@ def _primary_website(websites: List[str]) -> str:
 
 def normalize_item(item: Dict[str, Any], fallback_city: str = "",
                    city_slug: str = "") -> Optional[Dict[str, Any]]:
-    """Map a Catalog API branch object to a flat row. Requires at least one phone."""
-    phones, websites, emails = _contacts(item)
-    if not phones:
+    """Map a Catalog API branch object to a flat row. Requires at least one public contact."""
+    firm_id = str(item.get("id") or "")
+    source_url = f"{SITE_ORIGIN}/{city_slug or _city_alias(item)}/firm/{firm_id}"
+    summary = contact_summary(twogis_contacts(item, source_url))
+    phones, websites, emails = summary["phones"], summary["websites"], summary["emails"]
+    if not summary["contacts"]:
         return None
 
     rubrics = item.get("rubrics") or []
@@ -328,7 +334,7 @@ def normalize_item(item: Dict[str, Any], fallback_city: str = "",
 
     row: Dict[str, Any] = {
         "source": "2gis",
-        "phone": phones[0],
+        "phone": phones[0] if phones else "",
         "phone2": phones[1] if len(phones) > 1 else "",
         "phones": phones,
         "name": name,
@@ -350,6 +356,7 @@ def normalize_item(item: Dict[str, Any], fallback_city: str = "",
         "schedule": _schedule_str(item.get("schedule")),
         "postcode": postcode,
     }
+    row.update(summary)
     if KEEP_RAW:
         # Compact raw: drop huge nested blobs that aren't useful for re-use.
         raw = {k: v for k, v in item.items() if k not in ("geometry", "links")}
@@ -441,7 +448,7 @@ def resolve_region(slug_or_name: str, key: str) -> Optional[Dict[str, Any]]:
     for r in regions:
         code = (r.get("code") or "").lower()
         name = (r.get("name") or "").lower()
-        if needle in code or needle in name or code in needle or name in needle:
+        if (code and (needle in code or code in needle)) or (name and (needle in name or name in needle)):
             return r
     return None
 
@@ -481,7 +488,6 @@ def search_page(
     params: Dict[str, Any] = {
         "page": page,
         "page_size": page_size,
-        "locale": "ru_RU",
         "fields": ITEM_FIELDS,
         "key": key,
         "type": "branch",
@@ -525,12 +531,9 @@ def search_all(
                 location=location,
             )
         except urllib.error.HTTPError as e:
-            body = getattr(e, "_body", "") or ""
-            print(f"    HTTP {e.code} on page {page} ({label}): {body[:200]}")
-            break
+            raise RuntimeError(f"2GIS HTTP {e.code}, page {page} ({label})") from e
         except Exception as e:
-            print(f"    error on page {page} ({label}): {e}")
-            break
+            raise RuntimeError(f"2GIS page {page} ({label}): {e}") from e
 
         meta = data.get("meta") or {}
         code = meta.get("code")
@@ -543,7 +546,7 @@ def search_all(
             print(f"    API error page {page} ({label}): {err}")
             if etype in ("apiKeyIsBlocked", "forbidden", "unauthorized"):
                 raise PermissionError(str(err))
-            break
+            raise RuntimeError(f"2GIS API error: {err}")
 
         result = data.get("result") or {}
         batch = result.get("items") or []
@@ -603,10 +606,10 @@ def collect(items: Iterable[Dict[str, Any]], city_name: str, city_slug: str,
         row = normalize_item(it, fallback_city=city_name, city_slug=city_slug)
         if not row:
             continue
-        phone = row["phone"]
-        if phone in rows:
+        key = record_id(row)
+        if key in rows:
             continue
-        rows[phone] = row
+        rows[key] = row
         new += 1
     return new
 
@@ -749,6 +752,8 @@ def scrape(
     from parser_toolkit.core.resume import load_checkpoint, seed_rows
 
     QUERY = query or QUERY
+    if max_results is not None and max_results <= 0:
+        raise ValueError("--max must be positive")
     if max_results is not None:
         MAX = max_results
     if page_size is not None:
@@ -785,7 +790,7 @@ def scrape(
 
     rows: Dict[str, Dict[str, Any]] = {}
     if resume and OUT:
-        n = seed_rows(rows, load_checkpoint(OUT), key_fn=lambda r: r.get("phone") or "")
+        n = seed_rows(rows, load_checkpoint(OUT), key_fn=record_id)
         report.resumed = True
         report.resumed_from = n
         if n:

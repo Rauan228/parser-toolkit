@@ -53,6 +53,12 @@ class Place:
     phone: str = ""
     phone2: str = ""
     email: str = ""
+    emails: List[str] = field(default_factory=list)
+    websites: List[str] = field(default_factory=list)
+    whatsapp: List[str] = field(default_factory=list)
+    telegram: List[str] = field(default_factory=list)
+    viber: List[str] = field(default_factory=list)
+    contacts: List[Dict[str, str]] = field(default_factory=list)
     # source-specific ids / extras
     place_id: str = ""
     org_id: str = ""

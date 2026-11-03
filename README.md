@@ -1,5 +1,24 @@
 # 🧰 parser-toolkit
 
+**Сбор контактов компаний: [подробная инструкция на русском →](README.ru.md)**
+
+Windows: install Python 3.11+, extract the ZIP, then double-click `start_windows.bat`.
+macOS: install Python from python.org, then run `start_macos.command`.
+The launcher opens a local window for 2GIS / Yandex Maps searches, optional company-site enrichment,
+and Excel export (separate Companies and Contacts sheets), CSV and JSON.
+No AI subscription or browser cookies are needed for this workflow.
+
+```bash
+pip install -e ".[contacts]"
+python -m parser_toolkit gui
+# or without a window:
+python -m parser_toolkit contacts --source 2gis --query "типография" --city "Алматы" --max 10 --websites
+```
+
+Contacts retain source labels, extensions and per-contact URLs. Missing roles are left blank.
+Branches are deduplicated by source card ID, so a shared reception phone does not discard branches.
+Additional registries are not integrated into this workflow.
+
 > Ready-to-run local parsers for popular CIS/RU platforms — directories, marketplaces and real estate.
 
 [Русская версия →](README.ru.md)

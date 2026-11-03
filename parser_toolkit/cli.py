@@ -76,6 +76,8 @@ No Apify. Primarily direct HTTP; Playwright only for Kolesa phones.
 
 usage:
   parser-toolkit <source> [options]
+  parser-toolkit contacts --query "типография" --city "Алматы" --websites
+  parser-toolkit gui
   parser-toolkit doctor [--live]
   python -m parser_toolkit <source> [options]
 
@@ -114,7 +116,17 @@ def main(argv: Optional[List[str]] = None) -> None:
     raise SystemExit(run(argv))
 
 
+def _configure_stdio() -> None:
+    """Keep redirected Windows logs readable even with a legacy system codepage."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        encoding = str(getattr(stream, "encoding", "") or "").lower().replace("-", "")
+        if reconfigure and encoding != "utf8":
+            reconfigure(encoding="utf-8", errors="replace")
+
+
 def run(argv: Optional[List[str]] = None) -> int:
+    _configure_stdio()
     argv = list(sys.argv[1:] if argv is None else argv)
 
     if not argv or argv[0] in ("-h", "--help", "help"):
@@ -127,6 +139,13 @@ def run(argv: Optional[List[str]] = None) -> int:
         from parser_toolkit.doctor import run_doctor
 
         return run_doctor(argv[1:])
+
+    if argv[0] == "contacts":
+        from parser_toolkit.contacts import main as contacts_main
+        return _run(contacts_main, argv[1:])
+    if argv[0] == "gui":
+        from parser_toolkit.gui import main as gui_main
+        return _run(gui_main, argv[1:])
 
     source_key = argv[0]
     if source_key not in ALIASES:

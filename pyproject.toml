@@ -35,8 +35,9 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+contacts = ["openpyxl>=3.1,<4"]
 kolesa = ["playwright>=1.40.0"]
-all = ["playwright>=1.40.0"]
+all = ["playwright>=1.40.0", "openpyxl>=3.1,<4"]
 dev = ["playwright>=1.40.0"]
 
 [project.urls]

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — business contact workflow
+
+- Add a Russian desktop launcher and Windows/macOS start scripts.
+- Add `contacts` CLI with 2GIS / Yandex Maps / both, optional bounded company-site crawl,
+  Excel sheets for contacts and companies, Russian CSV exports, JSON and per-run diagnostics.
+- Preserve emails, messengers, contact labels, extensions and source URLs; retain email-only cards.
+- Deduplicate directory cards by ID instead of phone so branches are not lost.
+- Fix 2GIS Kazakhstan searches by letting the API choose locale instead of forcing `ru_RU`.
+- Report directory transport / format errors instead of treating them as empty successful searches.
+- Add a step-by-step Russian guide for installation, operation, output and troubleshooting.
+
 ## [0.4.0] — 2026-08-10
 
 ### Added

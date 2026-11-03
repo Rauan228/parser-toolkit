@@ -92,10 +92,16 @@ class TestNormalizeItem(unittest.TestCase):
         self.assertIn("phones", d)
         self.assertIsInstance(d["phones"], list)
 
-    def test_no_phone_skipped(self):
+    def test_no_phone_retained_when_other_contacts_exist(self):
         item = dict(self.item)
         item["phones"] = []
-        self.assertIsNone(ym.normalize_yandex_item(item))
+        place = ym.normalize_yandex_item(item)
+        self.assertIsNotNone(place)
+        self.assertEqual(place.phones, [])
+        self.assertTrue(place.telegram)
+
+    def test_no_contacts_skipped(self):
+        self.assertIsNone(ym.normalize_yandex_item({"id": "1", "title": "No contacts"}))
 
     def test_city_lookup(self):
         self.assertEqual(ym.lookup_city("Москва")[0], 213)

@@ -167,10 +167,20 @@ class ContactExport(unittest.TestCase):
                 csv_rows = list(csv.reader(f, delimiter=";"))
             self.assertTrue(csv_rows[1][0].startswith("'="))
             self.assertEqual(csv_rows[1][5], "'+77771234567")
-            self.assertEqual(json.loads(Path(paths["json"]).read_text())[0]["name"], row["name"])
+            self.assertEqual(json.loads(Path(paths["json"]).read_text(encoding="utf-8"))[0]["name"], row["name"])
 
 
 class CollectionWorkflow(unittest.TestCase):
+    def test_cli_logs_use_utf8_with_legacy_console_encoding(self):
+        raw = io.BytesIO()
+        stream = io.TextIOWrapper(raw, encoding="cp1252")
+        with patch("sys.stdout", stream):
+            self.assertEqual(run(["--help"]), 0)
+            print("Русский журнал")
+        stream.flush()
+        self.assertIn("Русский журнал", raw.getvalue().decode("utf-8"))
+        stream.detach()
+
     def args(self, out, **kwargs):
         values = dict(source="both", query="типография", cities=["Алматы"], max=2, out=out,
                       websites=False, website_pages=3, timeout=10, sleep=0, proxy="", no_excel=True)
@@ -184,8 +194,8 @@ class CollectionWorkflow(unittest.TestCase):
             out = str(Path(td) / "result")
             code = workflow.run_collection(self.args(out))
             self.assertEqual(code, 1)
-            self.assertEqual(json.loads(Path(out + ".json").read_text())[0]["name"], "Company")
-            report = json.loads(Path(out + ".run.json").read_text())
+            self.assertEqual(json.loads(Path(out + ".json").read_text(encoding="utf-8"))[0]["name"], "Company")
+            report = json.loads(Path(out + ".run.json").read_text(encoding="utf-8"))
             self.assertEqual(report["status"], "partial")
             self.assertIn("blocked", report["errors"][0])
 
@@ -196,16 +206,16 @@ class CollectionWorkflow(unittest.TestCase):
              patch.object(workflow, "crawl_website", return_value=([], ["https://example.org: offline"])), redirect_stdout(io.StringIO()):
             out = str(Path(td) / "result")
             self.assertEqual(workflow.run_collection(self.args(out, source="2gis", websites=True)), 0)
-            report = json.loads(Path(out + ".run.json").read_text())
+            report = json.loads(Path(out + ".run.json").read_text(encoding="utf-8"))
             self.assertEqual(report["status"], "partial")
             self.assertTrue(report["website_errors"])
-            self.assertEqual(json.loads(Path(out + ".json").read_text())[0]["email"], "sales@example.org")
+            self.assertEqual(json.loads(Path(out + ".json").read_text(encoding="utf-8"))[0]["email"], "sales@example.org")
 
     def test_empty_is_reported_and_returns_nonzero(self):
         with tempfile.TemporaryDirectory() as td, patch.object(workflow, "scrape", return_value=[]), redirect_stdout(io.StringIO()):
             out = str(Path(td) / "result")
             self.assertEqual(workflow.run_collection(self.args(out)), 1)
-            self.assertEqual(json.loads(Path(out + ".run.json").read_text())["status"], "empty")
+            self.assertEqual(json.loads(Path(out + ".run.json").read_text(encoding="utf-8"))["status"], "empty")
 
     def test_validation_before_network(self):
         with patch.object(workflow, "scrape") as scrape, redirect_stdout(io.StringIO()):

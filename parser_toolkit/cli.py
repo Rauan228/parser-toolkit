@@ -116,7 +116,17 @@ def main(argv: Optional[List[str]] = None) -> None:
     raise SystemExit(run(argv))
 
 
+def _configure_stdio() -> None:
+    """Keep redirected Windows logs readable even with a legacy system codepage."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        encoding = str(getattr(stream, "encoding", "") or "").lower().replace("-", "")
+        if reconfigure and encoding != "utf8":
+            reconfigure(encoding="utf-8", errors="replace")
+
+
 def run(argv: Optional[List[str]] = None) -> int:
+    _configure_stdio()
     argv = list(sys.argv[1:] if argv is None else argv)
 
     if not argv or argv[0] in ("-h", "--help", "help"):

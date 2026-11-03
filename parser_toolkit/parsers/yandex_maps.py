@@ -45,8 +45,11 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 # Allow `python yandex-maps/yandex_maps_parser.py` from repo root.
 from parser_toolkit.core.cli import add_common_args, resolve_cities  # noqa: E402
 from parser_toolkit.core.http import HttpClient, HttpError  # noqa: E402
-from parser_toolkit.core.models import Place, normalize_phone  # noqa: E402
-from parser_toolkit.core.output import dump_places  # noqa: E402
+from parser_toolkit.core.models import Place  # noqa: E402
+from parser_toolkit.core.output import dump_records  # noqa: E402
+
+from parser_toolkit.core.contacts import CONTACT_FIELDS, contact_summary, yandex_contacts
+from parser_toolkit.core.schema import record_id
 
 SOURCE = "yandex-maps"
 
@@ -166,7 +169,8 @@ CSV_FIELDS = [
     "website",
     "url",
     "place_id",
-]
+    "email",
+] + CONTACT_FIELDS
 
 
 # --- HTML / JSON extraction --------------------------------------------------
@@ -277,12 +281,13 @@ def normalize_yandex_item(
     domain: str = "yandex.ru",
     keep_raw: bool = True,
 ) -> Optional[Place]:
-    phones: List[str] = []
-    for p in item.get("phones") or []:
-        n = normalize_phone(p)
-        if n and n not in phones:
-            phones.append(n)
-    if not phones:
+    place_id = str(item.get("id") or "")
+    seoname = item.get("seoname") or ""
+    path = f"{seoname}/{place_id}" if seoname else place_id
+    source_url = f"https://{domain}/maps/org/{path}/" if place_id else ""
+    summary = contact_summary(yandex_contacts(item, source_url))
+    phones = summary["phones"]
+    if not summary["contacts"]:
         return None
 
     cats = item.get("categories") or []
@@ -358,7 +363,14 @@ def normalize_yandex_item(
         longitude=lon,
         rating=rating,
         reviews_count=reviews_count,
-        website=website,
+        website=summary["website"] or website,
+        email=summary["email"],
+        emails=summary["emails"],
+        websites=summary["websites"],
+        whatsapp=summary["whatsapp"],
+        telegram=summary["telegram"],
+        viber=summary["viber"],
+        contacts=summary["contacts"],
         url=url,
         place_id=place_id,
         metadata=meta,
@@ -415,7 +427,7 @@ def fetch_search_page(
         raise HttpError("Yandex Maps rate-limited this request", status=429, body=html)
     state = extract_app_state(html)
     if not state:
-        return {}, []
+        raise HttpError("Yandex Maps: страница поиска не содержит ожидаемых данных (капча или изменился формат)", status=200)
     return extract_search_results(state)
 
 
@@ -446,11 +458,7 @@ def search_city(
     empty_streak = 0
 
     while len(places) < max_results:
-        try:
-            results, items = fetch_search_page(client, domain, geo_id, seo, query, page)
-        except HttpError as e:
-            print(f"    page {page} error: {e}")
-            break
+        results, items = fetch_search_page(client, domain, geo_id, seo, query, page)
         if page == 1:
             print(f"    totalResultCount≈{results.get('totalResultCount')} pageSize≈{results.get('resultsCount') or results.get('requestResults')}")
         if not items:
@@ -462,12 +470,14 @@ def search_city(
             continue
         empty_streak = 0
         new_on_page = 0
+        new_ids = 0
         for it in items:
             pid = str(it.get("id") or "")
             if pid and pid in seen_ids:
                 continue
             if pid:
                 seen_ids.add(pid)
+            new_ids += 1
             place = normalize_yandex_item(
                 it, fallback_city=display, domain=domain, keep_raw=keep_raw
             )
@@ -477,12 +487,14 @@ def search_city(
             new_on_page += 1
             if len(places) >= max_results:
                 break
-        print(f"    page {page}: +{new_on_page} (unique with phone) | bag={len(places)}")
+        print(f"    page {page}: +{new_on_page} (unique with public contacts) | bag={len(places)}")
         if new_on_page == 0 and page > 1:
             # page returned only duplicates / phoneless cards
             empty_streak += 1
             if empty_streak >= 2:
                 break
+        if new_ids == 0:
+            break
         page += 1
         time.sleep(sleep)
     return places[:max_results]
@@ -506,23 +518,21 @@ def search_text(
         url = f"https://{domain}/maps/?text={urllib.parse.quote(text)}"
         if page > 1:
             url += f"&page={page}"
-        try:
-            html = client.get(url, accept="text/html", referer=f"https://{domain}/maps/")
-        except HttpError as e:
-            print(f"    text search page {page} error: {e}")
-            break
+        html = client.get(url, accept="text/html", referer=f"https://{domain}/maps/")
         state = extract_app_state(html)
         if not state:
-            break
+            raise HttpError("Yandex Maps: нет данных поиска, возможна капча", status=200)
         results, items = extract_search_results(state)
         if not items:
             break
+        new_ids = 0
         for it in items:
             pid = str(it.get("id") or "")
             if pid and pid in seen_ids:
                 continue
             if pid:
                 seen_ids.add(pid)
+            new_ids += 1
             place = normalize_yandex_item(
                 it, fallback_city=fallback_city, domain=domain, keep_raw=keep_raw
             )
@@ -530,6 +540,8 @@ def search_text(
                 places.append(place)
             if len(places) >= max_results:
                 break
+        if new_ids == 0:
+            break
         page += 1
         time.sleep(sleep)
     return places[:max_results]
@@ -569,6 +581,8 @@ def scrape(
     from parser_toolkit.core.report import RunReport, persist_run
     from parser_toolkit.core.resume import load_checkpoint
 
+    if max_results <= 0:
+        raise ValueError("--max must be positive")
     city_list = [c.strip() for c in (cities or []) if c and str(c).strip()] or list(DEFAULT_CITIES)
     host_list = domains or list(DEFAULT_DOMAINS)
     should_write = write if write is not None else bool(out)
@@ -587,35 +601,13 @@ def scrape(
     )
     domain = pick_domain(client, host_list)
 
-    by_phone: Dict[str, Place] = {}
+    by_id: Dict[str, Dict[str, Any]] = {}
     if resume and out:
         existing = load_checkpoint(out)
+        by_id = {record_id(row): row for row in existing if record_id(row)}
         report.resumed = True
-        report.resumed_from = 0
-        for row in existing:
-            phone = row.get("phone")
-            if not phone or phone in by_phone:
-                continue
-            by_phone[phone] = Place(
-                source=row.get("source") or "yandex-maps",
-                name=row.get("name") or row.get("title") or "",
-                category=row.get("category") or "",
-                phones=list(row.get("phones") or ([phone] if phone else [])),
-                address=row.get("address") or "",
-                city=row.get("city") or "",
-                latitude=row.get("latitude") or "",
-                longitude=row.get("longitude") or "",
-                rating=row.get("rating") or "",
-                reviews_count=row.get("reviews_count") or "",
-                website=row.get("website") or "",
-                url=row.get("url") or "",
-                phone=phone,
-                phone2=row.get("phone2") or "",
-                place_id=row.get("place_id") or row.get("id") or "",
-            ).finalize()
-            report.resumed_from += 1
-        if report.resumed_from:
-            print(f"resume: loaded {report.resumed_from} existing phones from {out}.*")
+        report.resumed_from = len(by_id)
+        print(f"resume: loaded {len(by_id)} organizations from {out}.*")
 
     for city in city_list:
         print(f"[{city}] …")
@@ -630,22 +622,18 @@ def scrape(
         )
         new = 0
         for place in found:
-            if not place.phone or place.phone in by_phone:
+            row = place.to_dict(keep_raw=keep_raw)
+            key = record_id(row)
+            if not key or key in by_id:
                 continue
-            by_phone[place.phone] = place
+            by_id[key] = row
             new += 1
-        print(f"[{city}] +{new} | total={len(by_phone)}")
+        print(f"[{city}] +{new} | total={len(by_id)}")
         if should_write and out:
-            dump_places(
-                by_phone.values(),
-                out,
-                fields=CSV_FIELDS,
-                keep_raw=keep_raw,
-                formats=formats,
-                source="yandex-maps",
-            )
+            dump_records(by_id.values(), out, fields=CSV_FIELDS,
+                         keep_raw=keep_raw, formats=formats, source=SOURCE)
 
-    records = [p.to_dict(keep_raw=keep_raw) for p in by_phone.values()]
+    records = list(by_id.values())
     if should_write and out:
         persist_run(
             records,
